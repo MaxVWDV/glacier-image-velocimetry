@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<addonCore>
-  <label>cbrewer : colorbrewer schemes for Matlab</label>
-  <version>1.1.0.0</version>
-  <type>zip</type>
-  <identifier>e583a467-4a80-11e4-9553-005056977bd0</identifier>
-  <createdBy name="Charles"/>
-  <image>resources/screenshot.png</image>
-</addonCore>
