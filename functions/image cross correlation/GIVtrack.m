@@ -1,4 +1,4 @@
-function [du, dv, peakCorr, meanAbsCorr,pu,pv]=GIVtrack(A,B,inputs,max_d)
+function [du, dv,snr,pkr]=GIVtrack(A,B,inputs,max_d)
 %% Feature tracking by template matching
 %
 %Takes an image pair and uses standard image velocimetry techniques in
@@ -8,15 +8,15 @@ function [du, dv, peakCorr, meanAbsCorr,pu,pv]=GIVtrack(A,B,inputs,max_d)
 %
 % OUTPUTS:
 %   du,dv: displacement of each point in pu,pv. [A(pu,pv) has moved to B(pu+du,pv+dv)]
-%   peakCorr: correlation coefficient of the matched template. 
+%   peakCorr: correlation coefficient of the matched template.
 %   meanAbsCorr: The mean absolute correlation coefficitent over the search
 %                region is an estimate of the noise level.
-%   pu,pv: actual pixel centers of templates in A may differ from inputs because of rounding. 
+%   pu,pv: actual pixel centers of templates in A may differ from inputs because of rounding.
 %
 %
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                   %% GLACIER IMAGE VELOCIMETRY (GIV) %%
+%% GLACIER IMAGE VELOCIMETRY (GIV) %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Code written by Max Van Wyk de Vries @ University of Minnesota
 %Credit to Ben Popken and Andrew Wickert for portions of the toolbox.
@@ -24,17 +24,17 @@ function [du, dv, peakCorr, meanAbsCorr,pu,pv]=GIVtrack(A,B,inputs,max_d)
 %Portions of this toolbox are based on a number of codes written by
 %previous authors, including matPIV, IMGRAFT, PIVLAB, M_Map and more.
 %Credit and thanks are due to the authors of these toolboxes, and for
-%sharing their codes online. See the user manual for a full list of third 
+%sharing their codes online. See the user manual for a full list of third
 %party codes used here. Accordingly, you are free to share, edit and
-%add to this GIV code. Please give us credit if you do, and share your code 
+%add to this GIV code. Please give us credit if you do, and share your code
 %with the same conditions as this.
 
-% Read the associated paper here: 
+% Read the associated paper here:
 % https://doi.org/10.5194/tc-2020-204
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                        %Version 0.7, Autumn 2020%
+%Version 0.8, Spring 2021%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                  %Feel free to contact me at vanwy048@umn.edu%
+%Feel free to contact me at vanwy048@umn.edu%
 
 
 %Largely based on function 'templatematch' by Alsak Grinstead, part of
@@ -76,7 +76,7 @@ else
     EW1 = [inputs.geotifflocationdata.CornerCoords.Lat(1,4),inputs.geotifflocationdata.CornerCoords.Lon(1,4)];
     EW2 = [inputs.geotifflocationdata.CornerCoords.Lat(1,3),inputs.geotifflocationdata.CornerCoords.Lon(1,3)];
 end
-    
+
 dy=coordtom(EW1,EW2);
 dx=coordtom(NS1,NS2);
 stepx=dx/scale_length(1); %m/pixel
@@ -88,9 +88,6 @@ pu=inputs.searchwindowsize(1)/2 : dpu : size(A,2)-inputs.searchwindowsize(1)/2;
 pv=inputs.searchwindowsize(1)/2: dpv : size(A,1)-inputs.searchwindowsize(1)/2;
 [pu,pv]=meshgrid(pu,pv);
 
-initialdu = 0;
-initialdv = 0;
-
 if any(inputs.searchwindowsize(:)>=max_d(:))||any(inputs.searchwindowsize(:)>=max_d(:))
     error('imgraft:inputerror','Search window size must be greater than template size.')
 end
@@ -98,6 +95,7 @@ end
 Np=numel(pu);
 du=nan(size(pu));
 dv=nan(size(pu));
+pkr=nan(size(pu));
 peakCorr=nan(size(pu));
 meanAbsCorr=nan(size(pu));
 
@@ -105,14 +103,14 @@ if all(isnan(pu+pv))
     error('imgraft:inputerror','No points to track (pu/pv is all nans)')
 end
 
-        if ~isfloat(A),A=im2float(A); end
-        if ~isfloat(B),B=im2float(B); end
-        gf=[1 0 -1]; %gf=[1 0;0 -1]; gf=[1 -1]; 
-        ofilter=@(A)exp(1i*atan2(imfilter(A,gf,'replicate'),imfilter(A,rot90(gf),'replicate')));
-        A=ofilter(A);B=ofilter(B);
+if ~isfloat(A),A=im2float(A); end
+if ~isfloat(B),B=im2float(B); end
+gf=[1 0 -1]; %gf=[1 0;0 -1]; gf=[1 -1];
+ofilter=@(A)exp(1i*atan2(imfilter(A,gf,'replicate'),imfilter(A,rot90(gf),'replicate')));
+A=ofilter(A);B=ofilter(B);
 
 if ~isreal(B)
-    B=conj(B); %TODO: if you pass it orientation angles. 
+    B=conj(B); %TODO: if you pass it orientation angles.
 end
 
 
@@ -124,7 +122,7 @@ for ii=1:Np
     SearchHeight=max_d(min(numel(max_d),ii))-1;
     TemplateWidth=inputs.searchwindowsize(min(numel(inputs.searchwindowsize),ii))-1;
     TemplateHeight=inputs.searchwindowsize(min(numel(inputs.searchwindowsize),ii))-1;
-    Acenter=round(p) - mod([TemplateWidth TemplateHeight]/2,1);  % centre coordinate of template 
+    Acenter=round(p) - mod([TemplateWidth TemplateHeight]/2,1);  % centre coordinate of template
     Bcenter=round(p+[initialdupart initialdvpart]) - mod([SearchWidth SearchHeight]/2,1); % centre coordinate of search region
     
     %what was actually used:
@@ -132,7 +130,7 @@ for ii=1:Np
     pv(ii)=Acenter(2);
     initialdupart=Bcenter(1)-Acenter(1);
     initialdvpart=Bcenter(2)-Acenter(2);
-
+    
     try
         BB=B( Bcenter(2)+(-SearchHeight/2:SearchHeight/2)  ,Bcenter(1)+(-SearchWidth/2:SearchWidth/2),:);
         if any(any(isnan(BB([1 end],[1 end]))))
@@ -168,24 +166,24 @@ for ii=1:Np
     
     %Slightly crude sub-pixel estimator
     switch edgedist  %SUBPIXEL METHOD:...
-        case 0, %do-nothing.... 
+        case 0 %do-nothing....
             mix=[];% do not accept peaks on edge
-        case 1, %3x3
+        case 1 %3x3
             c=C(mix(1)+(-1:1),mix(2)+(-1:1));
             [uu,vv]=meshgrid(uu(mix(2)+(-1:1)),vv(mix(1)+(-1:1)));
             c=(c-mean(c([1:4 6:9])));c(c<0)=0; %simple and excellent performance for landsat test images...
             c=c./sum(c(:));
             mix(2)=sum(uu(:).*c(:));
             mix(1)=sum(vv(:).*c(:));
-
+            
         otherwise %5x5....
             c=C(mix(1)+(-2:2),mix(2)+(-2:2));
             [uu,vv]=meshgrid(uu(mix(2)+(-2:2)),vv(mix(1)+(-2:2)));
-            c=(c-mean(c([1:12 14:end])));c(c<0)=0;%simple and excellent performance for landsat test images... 
+            c=(c-mean(c([1:12 14:end])));c(c<0)=0;%simple and excellent performance for landsat test images...
             c=c./sum(c(:));
             mix(2)=sum(uu(:).*c(:));
             mix(1)=sum(vv(:).*c(:));
-
+            
     end
     if ~isempty(mix)
         mix=mix([2 1]);
@@ -194,5 +192,33 @@ for ii=1:Np
         peakCorr(ii)=Cmax;
     end
     
+    % Find the signal to Noise ratio
+    R2=C;
+    
+    if ~isnan(nanmax(R2(:)))
+        try
+            %consider changing this from try-catch to a simpler
+            %distance check. The key here is the distance tot he
+            %image edge. When peak is close to edge, this NaN
+            %allocation may fail.
+            R2(max_y1-3:max_y1+3,max_x1-3:max_x1+3)=NaN;
+        catch
+            R2(max(max_y1,1):min(max_y1,size(R2,1)),max(max_x1,1):min(max_x1,size(R2,2)))=NaN;
+        end
+        [p2_y2,p2_x2]=find(R2==max(R2(:)));
+        
+        if length(p2_x2)>1
+            p2_x2=p2_x2(round(length(p2_x2)/2));
+            p2_y2=p2_y2(round(length(p2_y2)/2));
+        elseif isempty(p2_x2)
+            
+        end
+        % signal to noise:
+        pkr(ii)=C(max_y1,max_x1)/R2(p2_y2,p2_x2);
+    else
+        pkr(ii)=NaN;
+    end
+    
 end
 
+snr = peakCorr./meanAbsCorr;

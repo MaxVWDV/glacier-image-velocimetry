@@ -349,9 +349,9 @@ for year_loop = first_year:last_year
             
             %Infill isolated NaNs and do some slight smoothing
             
-            weighted_monthly_velocity = nanfillsm(weighted_monthly_velocity, inputs, 4, 3);
+            weighted_monthly_velocity = nanfillsm(weighted_monthly_velocity, 4,3);
             
-                        weighted_monthly_fd = nanfillsm(weighted_monthly_fd, inputs, 4, 3);
+                        weighted_monthly_fd = nanfillsm(weighted_monthly_fd, 4,3);
 
             
             %Finally we need to load the data into the outputs array. First
@@ -617,9 +617,9 @@ for year_loop = first_year:last_year
             
             %Infill isolated NaNs and do some slight smoothing
             
-            weighted_monthly_velocity = nanfillsm(weighted_monthly_velocity, inputs, 4, 3);
+            weighted_monthly_velocity = nanfillsm(weighted_monthly_velocity, 4,3);
             
-                        weighted_monthly_fd = nanfillsm(weighted_monthly_fd, inputs, 4, 3);
+                        weighted_monthly_fd = nanfillsm(weighted_monthly_fd, 4,3);
 
             
             %Finally we need to load the data into the outputs array. First
@@ -883,9 +883,9 @@ for year_loop = first_year:last_year
             
             %Infill isolated NaNs and do some slight smoothing
             
-            weighted_monthly_velocity = nanfillsm(weighted_monthly_velocity, inputs, 4, 3);
+            weighted_monthly_velocity = nanfillsm(weighted_monthly_velocity, 4,3);
             
-                        weighted_monthly_fd = nanfillsm(weighted_monthly_fd, inputs, 4, 3);
+                        weighted_monthly_fd = nanfillsm(weighted_monthly_fd, 4,3);
 
             
             %Finally we need to load the data into the outputs array. First
@@ -1151,9 +1151,9 @@ for year_loop = first_year:last_year
             
             %Infill isolated NaNs and do some slight smoothing
             
-            weighted_monthly_velocity = nanfillsm(weighted_monthly_velocity, inputs, 4, 3);
+            weighted_monthly_velocity = nanfillsm(weighted_monthly_velocity, 4,3);
             
-            weighted_monthly_fd = nanfillsm(weighted_monthly_fd, inputs, 4, 3);
+            weighted_monthly_fd = nanfillsm(weighted_monthly_fd, 4,3);
 
             
             %Finally we need to load the data into the outputs array. First
@@ -1583,7 +1583,7 @@ for iterations = 1:inputs.nummonthiter
          end %end findoutlier loop
          
         one_month_v_temp(numbering_system_temp,:) = reshape(nanfillsm(reshape(nanmean(one_month_v_temp(numbering_system_temp,:),1)...
-            ,inputs.sizevel),inputs,2,2),[1,inputs.sizevel(1)*inputs.sizevel(2)]); %fill some of the NaNs
+            ,inputs.sizevel),2,2),[1,inputs.sizevel(1)*inputs.sizevel(2)]); %fill some of the NaNs
         
 %     numbering_system_temp = numbering_system_temp+1;    
         
@@ -1723,7 +1723,7 @@ for iterations = 1:inputs.nummonthiter
          end %end findoutlier loop
          
         one_month_v_temp(numbering_system_temp,:) = reshape(nanfillsm(reshape(nanmean(one_month_v_temp(numbering_system_temp,:),1)...
-            ,inputs.sizevel),inputs,2,2),[1,inputs.sizevel(1)*inputs.sizevel(2)]); %fill some of the NaNs
+            ,inputs.sizevel),2,2),[1,inputs.sizevel(1)*inputs.sizevel(2)]); %fill some of the NaNs
        
 %        numbering_system_temp = numbering_system_temp+1; 
         
@@ -1752,8 +1752,8 @@ end % end of iterative loop
 
 
     for i = 1:size(monthly_averages,1) %Infill isolated NaNs and do some slight smoothing
-        monthly_averages{i,3} = nanfillsm(monthly_averages{i,3}, inputs, 3, 3);
-        monthly_averages{i,4} = nanfillsm(monthly_averages{i,4}, inputs, 3, 3);
+        monthly_averages{i,3} = nanfillsm(monthly_averages{i,3}, 3,3);
+        monthly_averages{i,4} = nanfillsm(monthly_averages{i,4}, 3,3);
     end
 
 

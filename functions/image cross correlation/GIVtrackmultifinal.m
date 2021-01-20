@@ -1,4 +1,4 @@
-function [xp,yp,up,vp,SnR,Pkh]=GIVtrackmultifinal(A,B,winsize,overlap,initialdx,initialdy)
+function [up,vp,SnR2,SnR]=GIVtrackmultifinal(A,B,winsize,overlap,initialdx,initialdy)
 % function [x,y,u,v,SnR,PeakHeight]=finalpass(A,B,winsize,overlap,initialdx,initialdy)
 %
 % Provides the final pass to get the displacements with
@@ -14,7 +14,7 @@ function [xp,yp,up,vp,SnR,Pkh]=GIVtrackmultifinal(A,B,winsize,overlap,initialdx,
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                   %% GLACIER IMAGE VELOCIMETRY (GIV) %%
+%% GLACIER IMAGE VELOCIMETRY (GIV) %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Code written by Max Van Wyk de Vries @ University of Minnesota
 %Credit to Ben Popken and Andrew Wickert for portions of the toolbox.
@@ -22,17 +22,17 @@ function [xp,yp,up,vp,SnR,Pkh]=GIVtrackmultifinal(A,B,winsize,overlap,initialdx,
 %Portions of this toolbox are based on a number of codes written by
 %previous authors, including matPIV, IMGRAFT, PIVLAB, M_Map and more.
 %Credit and thanks are due to the authors of these toolboxes, and for
-%sharing their codes online. See the user manual for a full list of third 
+%sharing their codes online. See the user manual for a full list of third
 %party codes used here. Accordingly, you are free to share, edit and
-%add to this GIV code. Please give us credit if you do, and share your code 
+%add to this GIV code. Please give us credit if you do, and share your code
 %with the same conditions as this.
 
-% Read the associated paper here: 
+% Read the associated paper here:
 % https://doi.org/10.5194/tc-2020-204
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                        %Version 0.7, Autumn 2020%
+%Version 0.7, Autumn 2020%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                  %Feel free to contact me at vanwy048@umn.edu%
+%Feel free to contact me at vanwy048@umn.edu%
 
 if length(winsize)==1
     M=winsize;
@@ -45,9 +45,9 @@ cj=1;
 % Allocate space for matrixes
 xp=zeros(ceil((size(A,1)-winsize)/((1-overlap)*winsize))+1, ...
     ceil((size(A,2)-M)/((1-overlap)*M))+1);
-yp=xp; up=xp; vp=xp; SnR=xp; Pkh=xp;
+yp=xp; up=xp; vp=xp; SnR2=xp; SnR=xp; Pkh=xp;
 
-IN=zeros(size(A)); 
+IN=zeros(size(A));
 
 %%%%%%%%%%%%%%% MAIN LOOP %%%%%%%%%%%%%%%%%%%%%%%%%
 tic
@@ -120,7 +120,7 @@ for jj=1:((1-overlap)*winsize):sy-winsize+1
                     R2(max_y1-1:max_y1+1,max_x1-1:max_x1+1)=NaN;
                 end
                 if size(R,1)==(winsize-1)
-                    [p2_y2,p2_x2]=find(R2==max(R2(:)));                    
+                    [p2_y2,p2_x2]=find(R2==max(R2(:)));
                 else
                     [p2_y2,p2_x2]=find(R2==max(max(R2(0.5*winsize:1.5*winsize-1,0.5*M:1.5*M-1))));
                 end
@@ -132,7 +132,8 @@ for jj=1:((1-overlap)*winsize):sy-winsize+1
                 end
                 % signal to noise:
                 snr=R(max_y1,max_x1)/R2(p2_y2,p2_x2);
-
+                snr2=R(max_y1,max_x1)/nanmean(abs(R),'all');
+                
                 
                 %%%%%%%%%%%%%%%%%%%%%% Store the displacements, SnR and Peak Height.
                 up(cj,ci)=(-x0+initialdx(cj,ci));
@@ -140,6 +141,7 @@ for jj=1:((1-overlap)*winsize):sy-winsize+1
                 xp(cj,ci)=(ii+(M/2)-1);
                 yp(cj,ci)=(jj+(winsize/2)-1);
                 SnR(cj,ci)=snr;
+                SnR2(cj,ci)=snr2;
                 Pkh(cj,ci)=R(max_y1,max_x1);
             else
                 up(cj,ci)=NaN; vp(cj,ci)=NaN; SnR(cj,ci)=NaN; Pkh(cj,ci)=0;
@@ -159,60 +161,60 @@ end
 
 
 % now we inline the function xcorrelate to shave off some time.
-function c = xcorrelate(a,b)
-%  c = xcorrelate(a,b)
-%
-%
-%   Two-dimensional cross-correlation using Fourier transforms.
-
-%This function is based upon an adaptation of the xcorrf tool written by 
-%R. Johnson. It has been adapted for use as part of GIV.
-
-
-  if nargin<3
-    pad='yes';
-  end
-  
-  
-  [ma,na] = size(a);
-  if nargin == 1
-    b = a;
-  end
-  [mb,nb] = size(b);
-  %       make reverse conjugate of one array
-  b = conj(b(mb:-1:1,nb:-1:1));
-  
-  if strcmp(pad,'yes');
-    %       use power of 2 transform lengths
-    mf = 2^nextpow2(ma+mb);
-    nf = 2^nextpow2(na+nb);
-    at = fft2(b,mf,nf);
-    bt = fft2(a,mf,nf);
-  elseif strcmp(pad,'no');
-    at = fft2(b);
-    bt = fft2(a);
-  else
-    disp('Wrong input to xcorrelate'); return
-  end
-  
-  %       multiply transforms then inverse transform
-  c = ifft2(at.*bt);
-  %       make real output for real input
-  if ~any(any(imag(a))) & ~any(any(imag(b)))
-    c = real(c);
-  end
-  %  trim to standard size
-  
-  if strcmp(pad,'yes');
-    c(ma+mb:mf,:) = [];
-    c(:,na+nb:nf) = [];
-  elseif strcmp(pad,'no');
-    c=fftshift(c(1:end-1,1:end-1));
-    
-   c(ma+mb:mf,:) = [];
-   c(:,na+nb:nf) = [];
-  end
-
-
-end
+    function c = xcorrelate(a,b)
+        %  c = xcorrelate(a,b)
+        %
+        %
+        %   Two-dimensional cross-correlation using Fourier transforms.
+        
+        %This function is based upon an adaptation of the xcorrf tool written by
+        %R. Johnson. It has been adapted for use as part of GIV.
+        
+        
+        if nargin<3
+            pad='yes';
+        end
+        
+        
+        [ma,na] = size(a);
+        if nargin == 1
+            b = a;
+        end
+        [mb,nb] = size(b);
+        %       make reverse conjugate of one array
+        b = conj(b(mb:-1:1,nb:-1:1));
+        
+        if strcmp(pad,'yes')
+            %       use power of 2 transform lengths
+            mf = 2^nextpow2(ma+mb);
+            nf = 2^nextpow2(na+nb);
+            at = fft2(b,mf,nf);
+            bt = fft2(a,mf,nf);
+        elseif strcmp(pad,'no')
+            at = fft2(b);
+            bt = fft2(a);
+        else
+            disp('Wrong input to xcorrelate'); return
+        end
+        
+        %       multiply transforms then inverse transform
+        c = ifft2(at.*bt);
+        %       make real output for real input
+        if ~any(any(imag(a))) && ~any(any(imag(b)))
+            c = real(c);
+        end
+        %  trim to standard size
+        
+        if strcmp(pad,'yes')
+            c(ma+mb:mf,:) = [];
+            c(:,na+nb:nf) = [];
+        elseif strcmp(pad,'no')
+            c=fftshift(c(1:end-1,1:end-1));
+            
+            c(ma+mb:mf,:) = [];
+            c(:,na+nb:nf) = [];
+        end
+        
+        
+    end
 end

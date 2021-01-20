@@ -7,8 +7,7 @@ function [mask] = make_mask(smoothsize)
 % mask - logical array
 %
 %Note: this function was contributed by Anonymous Reviewer 2 of The
-%Cryosphere manuscript. We thank them for a very thoughtful and
-%constructive review.
+%Cryosphere manuscript.
 
 if nargin<1, smoothsize = 3; end
 mask_radius = floor(smoothsize/2);

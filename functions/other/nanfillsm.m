@@ -1,4 +1,4 @@
-function out = nanfillsm(in, inputs, nantolerance, smoothsize);
+function out = nanfillsm(in, nantolerance, smoothsize);
 %This function fills in the NaN values in a given matrix where they are not
 %adjacent to a large number of other NaN values. It then smooths the
 %resulting matrix on a predefined size smoothing matrix.

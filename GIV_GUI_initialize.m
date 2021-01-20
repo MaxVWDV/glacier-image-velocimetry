@@ -248,12 +248,21 @@ GUIinputs = [];
             % Create SignaltonoiseratioEditField
             SignaltonoiseratioEditField = uieditfield(TemplatematchingTab, 'numeric');
             SignaltonoiseratioEditField.Position = [329 215 100 22];
-            if strcmpi(Switch.Value,'Multipass')
-            SignaltonoiseratioEditField.Value = 1.3;
-            else
             SignaltonoiseratioEditField.Value = 5;    
-            end 
             
+            
+            % Create PeakratioEditFieldLabel
+            PeakratioEditFieldLabel = uilabel(TemplatematchingTab);
+            PeakratioEditFieldLabel.HorizontalAlignment = 'right';
+            PeakratioEditFieldLabel.FontName = 'Cambria';
+            PeakratioEditFieldLabel.Position = [208 170 106 22];
+            PeakratioEditFieldLabel.Text = 'Peak ratio';
+
+            % Create PeakratioEditFieldField
+            PeakratioEditFieldField = uieditfield(TemplatematchingTab, 'numeric');
+            PeakratioEditFieldField.Position = [329 170 100 22];
+            PeakratioEditFieldField.Value = 1.3;
+ 
             
             
                         
@@ -750,7 +759,7 @@ GUIinputs = [];
             GIVAGLACIERVELOCITYCALCULATIONTOOLBOXBYMAXVANWYKDEVRIESLabel.FontName = 'Cambria';
             GIVAGLACIERVELOCITYCALCULATIONTOOLBOXBYMAXVANWYKDEVRIESLabel.FontAngle = 'italic';
             GIVAGLACIERVELOCITYCALCULATIONTOOLBOXBYMAXVANWYKDEVRIESLabel.Position = [116 26 447 22];
-            GIVAGLACIERVELOCITYCALCULATIONTOOLBOXBYMAXVANWYKDEVRIESLabel.Text = 'GIV: A GLACIER VELOCITY CALCULATION TOOLBOX BY MAX VAN WYK DE VRIES ET AL.';
+            GIVAGLACIERVELOCITYCALCULATIONTOOLBOXBYMAXVANWYKDEVRIESLabel.Text = 'GIV: A GLACIER VELOCITY TOOLBOX BY VAN WYK DE VRIES AND WICKERT';
 
             % Create WWWGIVGLACIERCOMCONTACTMEATVANWY048UMNEDULabel
             WWWGIVGLACIERCOMCONTACTMEATVANWY048UMNEDULabel = uilabel(GUIFigure);
@@ -758,7 +767,7 @@ GUIinputs = [];
             WWWGIVGLACIERCOMCONTACTMEATVANWY048UMNEDULabel.FontSize = 10;
             WWWGIVGLACIERCOMCONTACTMEATVANWY048UMNEDULabel.FontAngle = 'italic';
             WWWGIVGLACIERCOMCONTACTMEATVANWY048UMNEDULabel.Position = [184 6 295 22];
-            WWWGIVGLACIERCOMCONTACTMEATVANWY048UMNEDULabel.Text = 'WWW.GIVGLACIER.COM --- CONTACT ME AT VANWY048@UMN.EDU ';
+            WWWGIVGLACIERCOMCONTACTMEATVANWY048UMNEDULabel.Text = '             CONTACT ME AT VANWY048@UMN.EDU ';
 
             % Create CALCULATEVELOCITIESButton
             CALCULATEVELOCITIESButton = uibutton(GUIFigure, 'push');
@@ -848,6 +857,7 @@ GUIinputs = [];
             end
             
             GUIinputs.snr = SignaltonoiseratioEditField.Value;
+            GUIinputs.pkr = PeakratioEditFieldField.Value;
             GUIinputs.windowoverlap = 0.5;
             GUIinputs.idealresolution = IdealresolutionofoutputdataEditField.Value;
             GUIinputs.searchwindowsize = 30;
@@ -993,6 +1003,7 @@ GUIinputs = [];
             end
             
             GUIinputs.snr = SignaltonoiseratioEditField.Value;
+            GUIinputs.pkr = PeakratioEditFieldField.Value;
             GUIinputs.windowoverlap = 0.5;
             GUIinputs.idealresolution = IdealresolutionofoutputdataEditField.Value;
             GUIinputs.searchwindowsize = 30;
@@ -1132,6 +1143,7 @@ GUIinputs = [];
             end
             
             GUIinputs.snr = SignaltonoiseratioEditField.Value;
+            GUIinputs.pkr = PeakratioEditFieldField.Value;
             GUIinputs.windowoverlap = 0.5;
             GUIinputs.idealresolution = IdealresolutionofoutputdataEditField.Value;
             GUIinputs.searchwindowsize = 30;

@@ -1,5 +1,7 @@
-function out = smooth_snr(in, inputs);
-%This function smooths the signal to noise ratio matrixes. 
+function img = GIVtrackmultifilter(img,fsize)
+%Exit file is a matrix the size of the input with 0 where no outlier was
+%detected and 1 where an outlier was detected. Used to filter out poorly
+%matched velocity values.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                    %% GLACIER IMAGE VELOCIMETRY (GIV) %%
@@ -22,25 +24,20 @@ function out = smooth_snr(in, inputs);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                   %Feel free to contact me at vanwy048@umn.edu%
 
+    
+%% Lowpass filter outlier detection
 
-%% Find the right NaNs
-
-% Make NaN values a very large negative number
-smoothscale1 = round(0.1*size(in,1));
-smoothscale2 = round(0.1*size(in,2));
-mask    = ones(smoothscale1,smoothscale2);
-
-%% Smooth the whole matrix
-in_working = in;
-in_working(isnan(in)) = -999;
-    nanX    = isnan(in);
-    in(nanX) = 0;
-    out   = conv2(in,     mask, 'same') ./ ...
-          conv2(~nanX, mask, 'same');  
-out(in_working==-999)=NaN;
-
-
-
-
-
-
+%Local, small filter area
+nanX    = isnan(img);   %Find NaNs
+img(nanX) = 0; %Convert NaN to zero
+mask = strel('disk',fsize);
+mask = double(mask.Neighborhood);
+mask(fsize,fsize)=0; %Crop out central value
+in2   = conv2(img,     mask, 'same') ./ ...
+        conv2(~nanX, mask, 'same');
+      
+in_diff = abs(in2 - img);   
+img(in_diff>stdfilt(img,mask)*1)=NaN; %cannot be more than 1SD different from regional mean
+      
+img(nanX) = NaN; %Restore NAN
+    

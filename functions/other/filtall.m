@@ -8,7 +8,7 @@ function [images, images_stack]=filtall(images,inputs)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                   %% GLACIER IMAGE VELOCIMETRY (GIV) %%
+%% GLACIER IMAGE VELOCIMETRY (GIV) %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Code written by Max Van Wyk de Vries @ University of Minnesota
 %Credit to Ben Popken and Andrew Wickert for portions of the toolbox.
@@ -16,17 +16,17 @@ function [images, images_stack]=filtall(images,inputs)
 %Portions of this toolbox are based on a number of codes written by
 %previous authors, including matPIV, IMGRAFT, PIVLAB, M_Map and more.
 %Credit and thanks are due to the authors of these toolboxes, and for
-%sharing their codes online. See the user manual for a full list of third 
+%sharing their codes online. See the user manual for a full list of third
 %party codes used here. Accordingly, you are free to share, edit and
-%add to this GIV code. Please give us credit if you do, and share your code 
+%add to this GIV code. Please give us credit if you do, and share your code
 %with the same conditions as this.
 
-% Read the associated paper here: 
+% Read the associated paper here:
 % https://doi.org/10.5194/tc-2020-204
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                        %Version 0.7, Autumn 2020%
+%Version 0.7, Autumn 2020%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                  %Feel free to contact me at vanwy048@umn.edu%
+%Feel free to contact me at vanwy048@umn.edu%
 
 %% calculate velocity statistics
 
@@ -41,47 +41,47 @@ number_with_values = (size(images,2)-6)/2;
 %loop through all images
 for time_loop = 1:number_with_values
     position1 = 6+time_loop*2;
- for inner_loop = 2:inputs.numimages-time_loop
-    if ~isempty(images{inner_loop,position1})
-        number_in_range = number_in_range + 1;
+    for inner_loop = 2:inputs.numimages-time_loop
+        if ~isempty(images{inner_loop,position1})
+            number_in_range = number_in_range + 1;
+        end
     end
- end
-end 
+end
 
 %Create matrix to store all velocities and fd
 full_v = NaN(number_in_range,inputs.sizevel(1)*inputs.sizevel(2)+2);
 full_fd = NaN(number_in_range,inputs.sizevel(1)*inputs.sizevel(2)+2);
-  
+
 %loop through all
 for time_loop = 1:number_with_values
     position1 = time_loop + 6 + array_pos;
     position2 = time_loop + 7 + array_pos;
- for inner_loop = 2:inputs.numimages-time_loop
-    if ~isempty(images{inner_loop,position1})
-        %calculate time interval
-        time_gap = (images{inner_loop+time_loop,5}-images{inner_loop,5});
-        % Here calculates a median date for the interval that we will use
-        date_current = round(images{inner_loop+time_loop,4}-(time_gap/2));
-        full_v(inner_loop+meta_dum-1-emptycount_inner-emptycount_outer,1)= date_current;
-        full_fd(inner_loop+meta_dum-1-emptycount_inner-emptycount_outer,1)= date_current;
-    
-        %Linearize each velocity map
-        lin_v = reshape(images{inner_loop,position1},[1 inputs.sizevel(1)*inputs.sizevel(2)]);
-        full_v(inner_loop+meta_dum-1-emptycount_inner-emptycount_outer,3:inputs.sizevel(1)*inputs.sizevel(2)+2)= lin_v;
-      
-        %Linearize each flow direction map
-        lin_fd = reshape(images{inner_loop,position2},[1 inputs.sizevel(1)*inputs.sizevel(2)]);
-        lin_fd(lin_fd==0)=NaN;
-        full_fd(inner_loop+meta_dum-1-emptycount_inner-emptycount_outer,3:inputs.sizevel(1)*inputs.sizevel(2)+2)= lin_fd;
-    else
-        emptycount_inner = emptycount_inner + 1;
+    for inner_loop = 2:inputs.numimages-time_loop
+        if ~isempty(images{inner_loop,position1})
+            %calculate time interval
+            time_gap = (images{inner_loop+time_loop,5}-images{inner_loop,5});
+            % Here calculates a median date for the interval that we will use
+            date_current = round(images{inner_loop+time_loop,4}-(time_gap/2));
+            full_v(inner_loop+meta_dum-1-emptycount_inner-emptycount_outer,1)= date_current;
+            full_fd(inner_loop+meta_dum-1-emptycount_inner-emptycount_outer,1)= date_current;
+            
+            %Linearize each velocity map
+            lin_v = reshape(images{inner_loop,position1},[1 inputs.sizevel(1)*inputs.sizevel(2)]);
+            full_v(inner_loop+meta_dum-1-emptycount_inner-emptycount_outer,3:inputs.sizevel(1)*inputs.sizevel(2)+2)= lin_v;
+            
+            %Linearize each flow direction map
+            lin_fd = reshape(images{inner_loop,position2},[1 inputs.sizevel(1)*inputs.sizevel(2)]);
+            lin_fd(lin_fd==0)=NaN;
+            full_fd(inner_loop+meta_dum-1-emptycount_inner-emptycount_outer,3:inputs.sizevel(1)*inputs.sizevel(2)+2)= lin_fd;
+        else
+            emptycount_inner = emptycount_inner + 1;
+        end
     end
- end
- 
-emptycount_outer = emptycount_outer + emptycount_inner;
-emptycount_inner = 0;
-meta_dum = meta_dum + inputs.numimages-time_loop-1;
-array_pos = array_pos + 1;
+    
+    emptycount_outer = emptycount_outer + emptycount_inner;
+    emptycount_inner = 0;
+    meta_dum = meta_dum + inputs.numimages-time_loop-1;
+    array_pos = array_pos + 1;
 end
 
 %Create a column with sequential numbers in order for the initial order to
@@ -97,7 +97,6 @@ full_fd = sortrows(full_fd, 1);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %strip the numbering and date list off the main array and store separately.
-only_datelist = full_v(:,1); %list of dates
 only_numlist = full_v(:,2); %list of numbers for re-ordering
 
 %delete first two columns to leave just data itself
@@ -106,7 +105,7 @@ full_fd(:,1:2)=[];
 
 %% remove outliers in stack
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% First let's do this with the FLOW DIRECTION. 
+% First let's do this with the FLOW DIRECTION.
 
 %Calculate mean and standard deviation using circular statistics
 [mean_fd,std_fd] = GIV_circstats(full_fd);
@@ -129,7 +128,7 @@ high_fd(poshigh)=templow_fd(poshigh);
 %make full arrays of limits
 full_low_fd = [];
 full_high_fd = [];
-for index = 1:size(full_fd,1) 
+for index = 1:size(full_fd,1)
     full_low_fd(index,:) = low_fd;
     full_high_fd(index,:) = high_fd;
 end
@@ -169,10 +168,10 @@ full_fd(out_limits_vel==1)=NaN;
 
 %(Only filter velocity, these filters are not built for cyclical values)
 %TIME FILTER
-if strcmpi(inputs.finalsmooth, 'Time') 
+if strcmpi(inputs.finalsmooth, 'Time')
     full_v = nanfill_time(full_v, inputs, 2, 3);
-%TIME AND SPACE FILTER
-elseif strcmpi(inputs.finalsmooth, 'Time and Space') 
+    %TIME AND SPACE FILTER
+elseif strcmpi(inputs.finalsmooth, 'Time and Space')
     full_v = nanfill_timeandspace(full_v, inputs, 4, 3);
 end
 
@@ -183,7 +182,7 @@ end
 if size(full_fd,1)>1
     [mean_fd,std_fd] = GIV_circstats(full_fd);
 else
-    mean_fd = (full_fd); 
+    mean_fd = (full_fd);
     std_fd = (full_fd); %meaningless
 end
 
@@ -192,7 +191,7 @@ end
 if size(full_v,1)>1
     mean_v = nanmean(full_v);
 else
-    mean_v = (full_v);   
+    mean_v = (full_v);
 end
 
 if size(full_v,1)>1
@@ -201,17 +200,17 @@ else
     std_v = (full_v);     %meaningless
 end
 
-%reshape mean and std datasets 
+%reshape mean and std datasets
 mean_fd = (reshape(mean_fd,inputs.sizevel)); %flipud
 std_fd = (reshape(std_fd,inputs.sizevel)); %flipud
 mean_v = (reshape(mean_v,inputs.sizevel)); %flipud
 std_v = (reshape(std_v,inputs.sizevel)); %flipud
 
 %local smoothing and NaN filling
-mean_fd = nanfillsm(mean_fd, inputs, 4, 3);
-std_fd = nanfillsm(std_fd, inputs, 4, 3);
-mean_v = nanfillsm(mean_v, inputs, 4, 3);
-std_v = nanfillsm(std_v, inputs, 4, 3);
+mean_fd = nanfillsm(mean_fd, 4,3);
+std_fd = nanfillsm(std_fd, 4,3);
+mean_v = nanfillsm(mean_v, 4,3);
+std_v = nanfillsm(std_v, 4,3);
 
 %% Replace files in images array
 
@@ -236,21 +235,21 @@ emptycount_outer = 0;
 for time_loop = 1:number_with_values
     position1 = time_loop + 6 + array_pos;
     position2 = time_loop + 7 + array_pos;
- for inner_loop = 2:inputs.numimages-time_loop
-    if ~isempty(images{inner_loop,position1})
-    %Replace velocity in array   
-    images{inner_loop,position1} = (reshape(ordered_v(inner_loop+meta_dum-1-emptycount_inner-emptycount_outer,:),inputs.sizevel));%flipud
-    %Replace flow direction in array  
-    images{inner_loop,position2} = (reshape(ordered_fd(inner_loop+meta_dum-1-emptycount_inner-emptycount_outer,:),inputs.sizevel));  %flipud
-    else
-        emptycount_inner = emptycount_inner + 1;
-    end 
-end
- 
-emptycount_outer = emptycount_outer + emptycount_inner;
-emptycount_inner = 0;
-meta_dum = meta_dum + inputs.numimages-time_loop-1;
-array_pos = array_pos + 1;
+    for inner_loop = 2:inputs.numimages-time_loop
+        if ~isempty(images{inner_loop,position1})
+            %Replace velocity in array
+            images{inner_loop,position1} = (reshape(ordered_v(inner_loop+meta_dum-1-emptycount_inner-emptycount_outer,:),inputs.sizevel));%flipud
+            %Replace flow direction in array
+            images{inner_loop,position2} = (reshape(ordered_fd(inner_loop+meta_dum-1-emptycount_inner-emptycount_outer,:),inputs.sizevel));  %flipud
+        else
+            emptycount_inner = emptycount_inner + 1;
+        end
+    end
+    
+    emptycount_outer = emptycount_outer + emptycount_inner;
+    emptycount_inner = 0;
+    meta_dum = meta_dum + inputs.numimages-time_loop-1;
+    array_pos = array_pos + 1;
 end
 
 
@@ -293,10 +292,10 @@ else %(if only one single map)
     min_fd = (full_fd);
     min_v = (full_v);
     median_fd = (full_fd);
-    median_v = (full_v);    
+    median_v = (full_v);
 end
 
-%reshape mean and std datasets 
+%reshape mean and std datasets
 max_fd = (reshape(max_fd,inputs.sizevel));%flipud
 max_v = (reshape(max_v,inputs.sizevel));%flipud
 min_fd = (reshape(min_fd,inputs.sizevel));%flipud
@@ -305,12 +304,12 @@ median_fd = (reshape(median_fd,inputs.sizevel));%flipud
 median_v = (reshape(median_v,inputs.sizevel));%flipud
 
 %local smoothing and NaN filling
-max_fd = nanfillsm(max_fd, inputs, 4, 3);
-max_v = nanfillsm(max_v, inputs, 4, 3);
-min_fd = nanfillsm(min_fd, inputs, 4, 3);
-min_v = nanfillsm(min_v, inputs, 4, 3);
-median_fd = nanfillsm(median_fd, inputs, 4, 3);
-median_v = nanfillsm(median_v, inputs, 4, 3);
+max_fd = nanfillsm(max_fd, 4,3);
+max_v = nanfillsm(max_v, 4,3);
+min_fd = nanfillsm(min_fd, 4,3);
+min_v = nanfillsm(min_v, 4,3);
+median_fd = nanfillsm(median_fd, 4,3);
+median_v = nanfillsm(median_v, 4,3);
 perc_error_v = 100*std_v./mean_v;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

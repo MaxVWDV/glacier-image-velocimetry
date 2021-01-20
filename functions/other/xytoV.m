@@ -1,4 +1,4 @@
-function [V,fd] = xytoV(du, dv, mean_resolution, dt)
+function [V,fd] = xytoV(du, dv, dx, dy, dt)
 %input two direction files (x component of velocity, y component of
 %velocity), output a flow direction and a velocity magnitude
 
@@ -24,15 +24,15 @@ function [V,fd] = xytoV(du, dv, mean_resolution, dt)
                   %Feel free to contact me at vanwy048@umn.edu%
 
 %% Calculate velocity
-V= abs((du-dv*1i)*mean_resolution/dt); %Using imaginary values to indicate direction (for convenience).
+V= abs(((du.*dx)-(dv.*dy)*1i)/dt); %Using imaginary values to indicate direction (for convenience).
 
 %% Calculate flow direction
-dir_du = du;
-dir_dv = dv;
-ws = NaN*ones(size(dir_du));
+dir_du = (du.*dx);
+dir_dv = dv.*dy;
+% ws = NaN*ones(size(dir_du));
 fd = NaN*ones(size(dir_du));
 e = find(~isnan(dir_du) & ~isnan(dir_dv));
-ws(e) = sqrt(dir_du(e).*dir_du(e) + dir_dv(e).*dir_dv(e));
+% ws(e) = sqrt(dir_du(e).*dir_du(e) + dir_dv(e).*dir_dv(e));
 fd(e) = (180/pi)*atan2(dir_dv(e),dir_du(e));
 temp1=fd;
 temp1(fd>0) = 0;
