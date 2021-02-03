@@ -237,8 +237,8 @@ if strcmpi(inputs.parralelize, 'No')
                     
                     % First pass with a small window size and higher tolerance to fill
                     % small gaps:
-                    u = nanfillsm(u,inputs,2,2);
-                    v = nanfillsm(v,inputs,2,2);
+                    u = nanfillsm(u,2,2);
+                    v = nanfillsm(v,2,2);
                     
                     if  strcmpi(inputs.stable, 'Yes')
                         stable_used = (interp2(stable, linspace(1,size(images{2,3},2),size(u,2)).', linspace(1,size(images{2,3},1),size(u,1))));
@@ -268,7 +268,7 @@ if strcmpi(inputs.parralelize, 'No')
                     
                     %Smooth the velocity matrix with a small 2 by 2 filter, this
                     %function also interpolates over isolated missing pixels
-                    V = nanfillsm(V,inputs,2,2);
+                    V = nanfillsm(V,2,2);
                     
                     %Make the mask the same size as the velocity matrix
                     mask = flipud((interp2(inputs.cropmask,...
