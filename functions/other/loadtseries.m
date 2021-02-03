@@ -22,7 +22,7 @@ function [images,inputs]=loadtseries(inputs)
 %2017).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                   %% GLACIER IMAGE VELOCIMETRY (GIV) %%
+%% GLACIER IMAGE VELOCIMETRY (GIV) %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Code written by Max Van Wyk de Vries @ University of Minnesota
 %Credit to Ben Popken and Andrew Wickert for portions of the toolbox.
@@ -30,24 +30,24 @@ function [images,inputs]=loadtseries(inputs)
 %Portions of this toolbox are based on a number of codes written by
 %previous authors, including matPIV, IMGRAFT, PIVLAB, M_Map and more.
 %Credit and thanks are due to the authors of these toolboxes, and for
-%sharing their codes online. See the user manual for a full list of third 
+%sharing their codes online. See the user manual for a full list of third
 %party codes used here. Accordingly, you are free to share, edit and
-%add to this GIV code. Please give us credit if you do, and share your code 
+%add to this GIV code. Please give us credit if you do, and share your code
 %with the same conditions as this.
 
-% Read the associated paper here: 
+% Read the associated paper here:
 % https://doi.org/10.5194/tc-2020-204
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                        %Version 0.7, Autumn 2020%
+%Version 0.7, Autumn 2020%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                  %Feel free to contact me at vanwy048@umn.edu%
+%Feel free to contact me at vanwy048@umn.edu%
 
 
 % Check to make sure that folder actually exists.  Warn user if it doesn't.
 if ~isdir(inputs.folder)
-  errorMessage = sprintf('Error: The following folder does not exist:\n%s', inputs.folder);
-  uiwait(warndlg(errorMessage));
-  return;
+    errorMessage = sprintf('Error: The following folder does not exist:\n%s', inputs.folder);
+    uiwait(warndlg(errorMessage));
+    return;
 end
 
 %The correct folder should now be located. The objective of the following
@@ -72,71 +72,82 @@ for y=inputs.minyear:inputs.maxyear
         if m < 10
             m = strcat('0',num2str(m));
         else
-           m = num2str(m); 
+            m = num2str(m);
         end
         
         for d=inputs.minday:inputs.maxday
-                        if d < 10
-            d = strcat('0',num2str(d));
-        else
-           d = num2str(d); 
-                        end
-        if strcmpi(inputs.isgeotiff,'No')
-            datejpg = strcat(y,m,d,'.jpg');
-            datepng = strcat(y,m,d,'.png');
-          if exist(fullfile(inputs.folder, datejpg),'file') 
-            % read k onto first column
-            % read date into second column
-            % read the image into the kth position of the cell array on the
-            % third column
-            %create n_day, the number of days between different images
-            n_day = datenum(str2num(y),str2num(m),str2num(d));
-            %load n_day to fouth column
-            images{k,1}=k;
-            images{k,2}=(strcat(y,m,d));
-            images{k,3}=(imread(fullfile(inputs.folder,datejpg)));
-            images{k,4}=n_day;
-            % increment k for the next iteration
-            k=k+1;
-          elseif exist(fullfile(inputs.folder, datepng),'file')
-            % read k onto first column
-            % read date into second column
-            % read the image into the kth position of the cell array on the
-            % third column
-            %create n_day, the number of days between different images
-            n_day = datenum(str2num(y),str2num(m),str2num(d));
-            %load n_day to fouth column
-            images{k,1}=k;
-            images{k,2}=(strcat(y,m,d));
-            images{k,3}=(imread(fullfile(inputs.folder,datepng)));
-            images{k,4}=n_day;
-            % increment k for the next iteration
-            k=k+1;
-           
-          end
-        else
-            datetif = strcat(y,m,d,'.tif');
-            
-            if exist(fullfile(inputs.folder, datetif),'file') 
-               n_day = datenum(str2num(y),str2num(m),str2num(d));
-            %load n_day to fouth column
-            images{k,1}=k;
-            images{k,2}=(strcat(y,m,d));
-            images{k,3}=(imread(fullfile(inputs.folder,datetif)));
-            images{k,4}=n_day;
-            % increment k for the next iteration
-            k=k+1;
-            gooddatetif = datetif;
+            if d < 10
+                d = strcat('0',num2str(d));
+            else
+                d = num2str(d);
             end
-            
+            if strcmpi(inputs.isgeotiff,'No')
+                datejpg = strcat(y,m,d,'.jpg');
+                datepng = strcat(y,m,d,'.png');
+                if exist(fullfile(inputs.folder, datejpg),'file')
+                    % read k onto first column
+                    % read date into second column
+                    % read the image into the kth position of the cell array on the
+                    % third column
+                    %create n_day, the number of days between different images
+                    n_day = datenum(str2num(y),str2num(m),str2num(d));
+                    %load n_day to fouth column
+                    images{k,1}=k;
+                    images{k,2}=(strcat(y,m,d));
+                    images{k,3}=(imread(fullfile(inputs.folder,datejpg)));
+                    images{k,4}=n_day;
+                    % increment k for the next iteration
+                    k=k+1;
+                elseif exist(fullfile(inputs.folder, datepng),'file')
+                    % read k onto first column
+                    % read date into second column
+                    % read the image into the kth position of the cell array on the
+                    % third column
+                    %create n_day, the number of days between different images
+                    n_day = datenum(str2num(y),str2num(m),str2num(d));
+                    %load n_day to fouth column
+                    images{k,1}=k;
+                    images{k,2}=(strcat(y,m,d));
+                    images{k,3}=(imread(fullfile(inputs.folder,datepng)));
+                    images{k,4}=n_day;
+                    % increment k for the next iteration
+                    k=k+1;
+                    
+                end
+            else
+                datetif = strcat(y,m,d,'.tif');
+                datetiff = strcat(y,m,d,'.tiff');
+                
+                if exist(fullfile(inputs.folder, datetif),'file')
+                    n_day = datenum(str2num(y),str2num(m),str2num(d));
+                    %load n_day to fouth column
+                    images{k,1}=k;
+                    images{k,2}=(strcat(y,m,d));
+                    images{k,3}=(imread(fullfile(inputs.folder,datetif)));
+                    images{k,4}=n_day;
+                    % increment k for the next iteration
+                    k=k+1;
+                    gooddatetif = datetif;
+                elseif exist(fullfile(inputs.folder, datetiff),'file')
+                    n_day = datenum(str2num(y),str2num(m),str2num(d));
+                    %load n_day to fouth column
+                    images{k,1}=k;
+                    images{k,2}=(strcat(y,m,d));
+                    images{k,3}=(imread(fullfile(inputs.folder,datetiff)));
+                    images{k,4}=n_day;
+                    % increment k for the next iteration
+                    k=k+1;
+                    gooddatetif = datetiff;
+                end
+                
+            end
         end
-        end
-      end
+    end
 end
 
 if  strcmpi(inputs.isgeotiff,'Yes')
-inputs.geotifflocationdata = geotiffinfo(fullfile(inputs.folder,gooddatetif));
-[~,inputs.geotiffreference] = geotiffread(fullfile(inputs.folder,gooddatetif));
+    inputs.geotifflocationdata = geotiffinfo(fullfile(inputs.folder,gooddatetif));
+    [~,inputs.geotiffreference] = geotiffread(fullfile(inputs.folder,gooddatetif));
 end
 
 size_tocrop = size(images);
@@ -158,12 +169,12 @@ for c = 2:num_images
     if c < 3
         images{c,6} = 0;
     else
-    c_2 = c-1;
-    images{c,6} = (images{c,5}(1) - images{c_2,5}(1))/365;
+        c_2 = c-1;
+        images{c,6} = (images{c,5}(1) - images{c_2,5}(1))/365;
     end
     c = c+1;
 end
-    
+
 % At this point all the data we need should be loaded into one array,
 % called 'images'.
 % We can call the images, image time spacing, etc from this array.

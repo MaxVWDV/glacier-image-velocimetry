@@ -1,9 +1,9 @@
 function GIVruntime(inputs)
 %This function calculates the number of possible image pairs in a given
-%dataset. 
+%dataset.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                   %% GLACIER IMAGE VELOCIMETRY (GIV) %%
+%% GLACIER IMAGE VELOCIMETRY (GIV) %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Code written by Max Van Wyk de Vries @ University of Minnesota
 %Credit to Ben Popken and Andrew Wickert for portions of the toolbox.
@@ -11,17 +11,17 @@ function GIVruntime(inputs)
 %Portions of this toolbox are based on a number of codes written by
 %previous authors, including matPIV, IMGRAFT, PIVLAB, M_Map and more.
 %Credit and thanks are due to the authors of these toolboxes, and for
-%sharing their codes online. See the user manual for a full list of third 
+%sharing their codes online. See the user manual for a full list of third
 %party codes used here. Accordingly, you are free to share, edit and
-%add to this GIV code. Please give us credit if you do, and share your code 
+%add to this GIV code. Please give us credit if you do, and share your code
 %with the same conditions as this.
 
-% Read the associated paper here: 
+% Read the associated paper here:
 % https://doi.org/10.5194/tc-2020-204
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                        %Version 0.7, Autumn 2020%
+%Version 0.7, Autumn 2020%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                  %Feel free to contact me at vanwy048@umn.edu%
+%Feel free to contact me at vanwy048@umn.edu%
 
 
 %% load images
@@ -49,9 +49,9 @@ function GIVruntime(inputs)
 
 % Check to make sure that folder actually exists.  Warn user if it doesn't.
 if ~isdir(inputs.folder)
-  errorMessage = sprintf('Error: The following folder does not exist:\n%s', inputs.folder);
-  uiwait(warndlg(errorMessage));
-  return;
+    errorMessage = sprintf('Error: The following folder does not exist:\n%s', inputs.folder);
+    uiwait(warndlg(errorMessage));
+    return;
 end
 
 %The correct folder should now be located. The objective of the following
@@ -77,64 +77,76 @@ for y=inputs.minyear:inputs.maxyear;
         if m < 10
             m = strcat('0',num2str(m));
         else
-           m = num2str(m); 
+            m = num2str(m);
         end
         
         for d=inputs.minday:inputs.maxday
-                        if d < 10
-            d = strcat('0',num2str(d));
-        else
-           d = num2str(d); 
-                        end
-        if strcmpi(inputs.isgeotiff,'No')
-            datejpg = strcat(y,m,d,'.jpg');
-            datepng = strcat(y,m,d,'.png');
-          if exist(fullfile(inputs.folder, datejpg),'file') 
-            % read k onto first column
-            % read date into second column
-            % read the image into the kth position of the cell array on the
-            % third column
-            %create n_day, the number of days between different images
-            n_day = datenum(str2num(y),str2num(m),str2num(d));
-            %load n_day to fouth column
-            images{k,1}=k;
-            images{k,2}=(strcat(y,m,d));
-            images{k,3}=(imread(fullfile(inputs.folder,datejpg)));
-            images{k,4}=n_day;
-            % increment k for the next iteration
-            k=k+1;
-          elseif exist(fullfile(inputs.folder, datepng),'file')
-            % read k onto first column
-            % read date into second column
-            % read the image into the kth position of the cell array on the
-            % third column
-            %create n_day, the number of days between different images
-            n_day = datenum(str2num(y),str2num(m),str2num(d));
-            %load n_day to fouth column
-            images{k,1}=k;
-            images{k,2}=(strcat(y,m,d));
-            images{k,3}=(imread(fullfile(inputs.folder,datepng)));
-            images{k,4}=n_day;
-            % increment k for the next iteration
-            k=k+1;
+            if d < 10
+                d = strcat('0',num2str(d));
+            else
+                d = num2str(d);
+            end
+            if strcmpi(inputs.isgeotiff,'No')
+                datejpg = strcat(y,m,d,'.jpg');
+                datepng = strcat(y,m,d,'.png');
+                if exist(fullfile(inputs.folder, datejpg),'file')
+                    % read k onto first column
+                    % read date into second column
+                    % read the image into the kth position of the cell array on the
+                    % third column
+                    %create n_day, the number of days between different images
+                    n_day = datenum(str2num(y),str2num(m),str2num(d));
+                    %load n_day to fouth column
+                    images{k,1}=k;
+                    images{k,2}=(strcat(y,m,d));
+                    images{k,3}=(imread(fullfile(inputs.folder,datejpg)));
+                    images{k,4}=n_day;
+                    % increment k for the next iteration
+                    k=k+1;
+                elseif exist(fullfile(inputs.folder, datepng),'file')
+                    % read k onto first column
+                    % read date into second column
+                    % read the image into the kth position of the cell array on the
+                    % third column
+                    %create n_day, the number of days between different images
+                    n_day = datenum(str2num(y),str2num(m),str2num(d));
+                    %load n_day to fouth column
+                    images{k,1}=k;
+                    images{k,2}=(strcat(y,m,d));
+                    images{k,3}=(imread(fullfile(inputs.folder,datepng)));
+                    images{k,4}=n_day;
+                    % increment k for the next iteration
+                    k=k+1;
+                    
+                end
+            else
+                datetif = strcat(y,m,d,'.tif');
+                datetiff = strcat(y,m,d,'.tiff');
                 
-          end
-        else
-            datetif = strcat(y,m,d,'.tif');
-            
-            if exist(fullfile(inputs.folder, datetif),'file') 
-                n_day = datenum(str2num(y),str2num(m),str2num(d));
-                %load n_day to fouth column
-                images{k,1}=k;
-                images{k,2}=(strcat(y,m,d));
-                images{k,3}=(imread(fullfile(inputs.folder,datetif)));
-                images{k,4}=n_day;
-                % increment k for the next iteration
-                k=k+1;
+                if exist(fullfile(inputs.folder, datetif),'file')
+                    n_day = datenum(str2num(y),str2num(m),str2num(d));
+                    %load n_day to fouth column
+                    images{k,1}=k;
+                    images{k,2}=(strcat(y,m,d));
+                    images{k,3}=(imread(fullfile(inputs.folder,datetif)));
+                    images{k,4}=n_day;
+                    % increment k for the next iteration
+                    k=k+1;
+                    gooddatetif = datetif;
+                elseif exist(fullfile(inputs.folder, datetiff),'file')
+                    n_day = datenum(str2num(y),str2num(m),str2num(d));
+                    %load n_day to fouth column
+                    images{k,1}=k;
+                    images{k,2}=(strcat(y,m,d));
+                    images{k,3}=(imread(fullfile(inputs.folder,datetiff)));
+                    images{k,4}=n_day;
+                    % increment k for the next iteration
+                    k=k+1;
+                    gooddatetif = datetiff;
+                end
             end
         end
-        end
-      end
+    end
 end
 
 size_tocrop = size(images);
@@ -157,12 +169,12 @@ for c = 2:num_images
     if c < 3;
         images{c,6} = 0;
     else
-    c_2 = c-1;
-    images{c,6} = (images{c,5}(1) - images{c_2,5}(1))/365;
+        c_2 = c-1;
+        images{c,6} = (images{c,5}(1) - images{c_2,5}(1))/365;
     end
     c = c+1;
 end
-    
+
 % At this point all the data we need should be loaded into one array,
 % called 'images'.
 % We can call the images, image time spacing, etc from this array.
@@ -182,41 +194,41 @@ for i = 1:inputs.numimages
     array_pos = 0;
     emptycount_inner = 0;
     emptycount_outer = 0;
-
-for time_loop = 1:i  %for multisampling in time
-   for inner_loop = 2:inputs.numimages-time_loop  %main loop
-    loop2 = inner_loop+time_loop; %for multisampling in time, will skip one for higher time_bracket
-
-    %Work out time between two images.
-    A1_t= (images{inner_loop,5});
-    B1_t= (images{loop2,5});
-    timestep = (B1_t-A1_t)/365;
-    if timestep <= inputs.maxinterval && timestep >= inputs.mininterval
-        number_in_range = number_in_range + 1;
+    
+    for time_loop = 1:i  %for multisampling in time
+        for inner_loop = 2:inputs.numimages-time_loop  %main loop
+            loop2 = inner_loop+time_loop; %for multisampling in time, will skip one for higher time_bracket
+            
+            %Work out time between two images.
+            A1_t= (images{inner_loop,5});
+            B1_t= (images{loop2,5});
+            timestep = (B1_t-A1_t)/365;
+            if timestep <= inputs.maxinterval && timestep >= inputs.mininterval
+                number_in_range = number_in_range + 1;
+            end
+            emptycount_outer = emptycount_outer + emptycount_inner;
+            emptycount_inner = 0;
+            meta_dum = meta_dum + inputs.numimages-time_loop-1;
+            array_pos = array_pos+1;
+        end
     end
-    emptycount_outer = emptycount_outer + emptycount_inner;
-    emptycount_inner = 0;
-    meta_dum = meta_dum + inputs.numimages-time_loop-1;
-    array_pos = array_pos+1;
-   end
-end
-
-numpairs(i,1) = i;
-numpairs(i,2) = number_in_range;
-numpairs(i,3) = number_in_range-previous_number;
-previous_number = number_in_range;
+    
+    numpairs(i,1) = i;
+    numpairs(i,2) = number_in_range;
+    numpairs(i,3) = number_in_range-previous_number;
+    previous_number = number_in_range;
 end
 
 
 %Line plot of total number of pairs vs t oversampling
 figure; plot(numpairs(:,1),numpairs(:,2),'k')
-    title('Total number of image pairs')
-    xlabel('Temporal oversampling value') 
-    ylabel('Number of pairs') 
+title('Total number of image pairs')
+xlabel('Temporal oversampling value')
+ylabel('Number of pairs')
 % % %Line plot of total number of pairs vs t oversampling, only first 10
 % % figure; plot(numpairs(1:10,1),numpairs(1:10,2),'k')
 %Scatter plot of number of pairs for each oversampling
 figure; bar(numpairs(:,1),numpairs(:,3),'k')
-    title('Number of image pairs per individual oversample')
-    xlabel('Temporal oversampling value') 
-    ylabel('Number of pairs')
+title('Number of image pairs per individual oversample')
+xlabel('Temporal oversampling value')
+ylabel('Number of pairs')

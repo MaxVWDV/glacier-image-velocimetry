@@ -304,8 +304,11 @@ if strcmpi(inputs.savearrays, 'Yes') || strcmpi(inputs.savekeyvel, 'Yes') || str
                 'RowsStartFrom',inputs.geotiffreference.RowsStartFrom);
             catch
                 %Was probably geographic coord system
-                inputs.geotiffreference = inputs.geotifflocationdata.SpatialRef;
-                inputs.geotiffreference.RasterSize = [size(images_stack{3,2},1),size(images_stack{3,2},2)];
+                inputs.geotiffreference = maprefpostings(inputs.geotiffreference.XIntrinsicLimits,...
+                inputs.geotiffreference.YIntrinsicLimits,...
+                [size(images_stack{3,2},1),size(images_stack{3,2},2)],...
+                'ColumnsStartFrom',inputs.geotiffreference.ColumnsStartFrom,...
+                'RowsStartFrom',inputs.geotiffreference.RowsStartFrom);
             end
             
             
