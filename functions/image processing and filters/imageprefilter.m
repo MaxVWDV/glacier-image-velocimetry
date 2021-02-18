@@ -68,14 +68,7 @@ out=double(out);
 %orientation filtering and its advantages. The paper is very readable.
 
 if inputs.NAOF == 1
-    filter_1 = [-1 2 -1];
-    filter_2 = [-1; 2; -1];
-    filter_3 = [-1 0 0;0 2 0; 0 0 -1];
-    filter_4 = [0 0 -1;0 2 0; -1 0 0]; 
-    out = real(exp(1i*atan2(imfilter(out,filter_1,'replicate'),imfilter(out,rot90(filter_1),'replicate'))))...
-        +real(exp(1i*atan2(imfilter(out,filter_2,'replicate'),imfilter(out,rot90(filter_2),'replicate'))))...
-        +real(exp(1i*atan2(imfilter(out,filter_3,'replicate'),imfilter(out,rot90(filter_3),'replicate'))))...
-        +real(exp(1i*atan2(imfilter(out,filter_4,'replicate'),imfilter(out,rot90(filter_4),'replicate'))));
+out = NAOF2(out);
 end
 
 in = out;

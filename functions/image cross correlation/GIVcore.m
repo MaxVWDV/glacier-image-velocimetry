@@ -219,40 +219,9 @@ if strcmpi(inputs.parralelize, 'No')
                     
                     
                     %Switch to velocity and flow direction
-                    [V,~] = xytoV(u, v,  stepx, stepy , dt);
+                    [V,fd] = xytoV(u, v, stepx, stepy , dt);
                     
-                    %Now apply a filter to remove outlier values (see myfilter function for
-                    %details, detects values that are too different from their neighbors
-                    %and removes them)
-                    filtermask = myfilter(V, inputs);
-                    u(filtermask == 1) = NaN;
-                    v(filtermask == 1) = NaN;
-                    V(V > inputs.maxvel) = -1;
-                    V(V == -1) = NaN;
-                    
-                    %Finally apply a selective interpolation and smoothing algorithm to
-                    %infill the gaps created and prior non-tracked values without creating
-                    %spurious peaks/troughs. If not sufficient data is present in the area
-                    %to make an interpolation, it will not be done.
-                    
-                    % First pass with a small window size and higher tolerance to fill
-                    % small gaps:
-                    u = nanfillsm(u,2,2);
-                    v = nanfillsm(v,2,2);
-                    
-                    if  strcmpi(inputs.stable, 'Yes')
-                        stable_used = (interp2(stable, linspace(1,size(images{2,3},2),size(u,2)).', linspace(1,size(images{2,3},1),size(u,1))));
-                        dudiff = nanmean(u(stable_used == 1));
-                        dvdiff = nanmean(v(stable_used == 1));
-                        u = u - dudiff;
-                        v = v - dvdiff;
-                    end
-                    
-                    [V,fd] = xytoV(u, v,stepx, stepy , dt);
-                    V(V > inputs.maxvel) = -1;
-                    V(V == -1) = NaN;
-                    
-                    %Exclude displacements in wrong direction.
+                    %Flow direction filter.
                     if strcmpi(inputs.excludeangle, 'Yes')
                         
                         %Remove areas flowing in wrong direction (change direction for specific
@@ -266,9 +235,38 @@ if strcmpi(inputs.parralelize, 'No')
                         
                     end
                     
-                    %Smooth the velocity matrix with a small 2 by 2 filter, this
-                    %function also interpolates over isolated missing pixels
-                    V = nanfillsm(V,2,2);
+                    %Now apply a filter to remove outlier values (see myfilter function for
+                    %details, detects values that are too different from their neighbors
+                    %and removes them)
+                    filtermask = myfilter(V, inputs);
+                    u(filtermask == 1) = NaN;
+                    v(filtermask == 1) = NaN;
+                    
+                    % First pass with a small window size and higher tolerance to fill
+                    % small gaps:
+                    u = nanfillsm(u,2,2);
+                    v = nanfillsm(v,2,2);
+                    
+                    
+                    V(V > inputs.maxvel) = -1;
+                    u(V == -1) = NaN;
+                    v(V == -1) = NaN;
+                    
+                    %Stable ground correction?
+                    if  strcmpi(inputs.stable, 'Yes')
+                        stable_used = (interp2(stable, linspace(1,size(images{2,3},2),size(u,2)).', linspace(1,size(images{2,3},1),size(u,1))));
+                        dudiff = nanmedian(u(stable_used == 1));
+                        dvdiff = nanmedian(v(stable_used == 1));
+                        u = u - dudiff;
+                        v = v - dvdiff;
+                    end
+                                       
+                    
+                    %Again smooth the velocity matrix with a small 2 by 2
+                    %filter, interpolate over pixels removed in previous
+                    %step
+                    u = nanfillsm(u,2,2);
+                    v = nanfillsm(v,2,2);
                     
                     %Make the mask the same size as the velocity matrix
                     mask = flipud((interp2(inputs.cropmask,...
@@ -276,8 +274,11 @@ if strcmpi(inputs.parralelize, 'No')
                         linspace(1, size(images{2,3},1), size(V,1)))));
                     
                     %Mask out areas
-                    V(mask==0) = NaN;
-                    fd(mask==0) = NaN;
+                    u(mask==0) = NaN;
+                    v(mask==0) = NaN;
+                    
+                    %Save as velocity and fd
+                    [V,fd] = xytoV(u, v, stepx, stepy , dt);
                     
                     %import results to master index before loop continues. Name first
                     %row of each.
@@ -425,40 +426,9 @@ elseif strcmpi(inputs.parralelize, 'Yes')
                     
                     
                     %Switch to velocity and flow direction
-                    [V,~] = xytoV(u, v, stepx, stepy , dt);
-                    
-                    %Now apply a filter to remove outlier values (see myfilter function for
-                    %details, detects values that are too different from their neighbors
-                    %and removes them)
-                    filtermask = myfilter(V, inputs);
-                    u(filtermask == 1) = NaN;
-                    v(filtermask == 1) = NaN;
-                    V(V > inputs.maxvel) = -1;
-                    V(V == -1) = NaN;
-                    
-                    %Finally apply a selective interpolation and smoothing algorithm to
-                    %infill the gaps created and prior non-tracked values without creating
-                    %spurious peaks/troughs. If not sufficient data is present in the area
-                    %to make an interpolation, it will not be done.
-                    
-                    % First pass with a small window size and higher tolerance to fill
-                    % small gaps:
-                    u = nanfillsm(u,2,2);
-                    v = nanfillsm(v,2,2);
-                    
-                    if  strcmpi(inputs.stable, 'Yes')
-                        stable_used = (interp2(stable, linspace(1,size(images{2,3},2),size(u,2)).', linspace(1,size(images{2,3},1),size(u,1))));
-                        dudiff = nanmean(u(stable_used == 1));
-                        dvdiff = nanmean(v(stable_used == 1));
-                        u = u - dudiff;
-                        v = v - dvdiff;
-                    end
-                    
                     [V,fd] = xytoV(u, v, stepx, stepy , dt);
-                    V(V > inputs.maxvel) = -1;
-                    V(V == -1) = NaN;
                     
-                    %Exclude displacements in wrong direction.
+                    %Flow direction filter.
                     if strcmpi(inputs.excludeangle, 'Yes')
                         
                         %Remove areas flowing in wrong direction (change direction for specific
@@ -472,9 +442,38 @@ elseif strcmpi(inputs.parralelize, 'Yes')
                         
                     end
                     
-                    %Smooth the velocity matrix with a small 2 by 2 filter, this
-                    %function also interpolates over isolated missing pixels
-                    V = nanfillsm(V,2,2);
+                    %Now apply a filter to remove outlier values (see myfilter function for
+                    %details, detects values that are too different from their neighbors
+                    %and removes them)
+                    filtermask = myfilter(V, inputs);
+                    u(filtermask == 1) = NaN;
+                    v(filtermask == 1) = NaN;
+                    
+                    % First pass with a small window size and higher tolerance to fill
+                    % small gaps:
+                    u = nanfillsm(u,2,2);
+                    v = nanfillsm(v,2,2);
+                    
+                    
+                    V(V > inputs.maxvel) = -1;
+                    u(V == -1) = NaN;
+                    v(V == -1) = NaN;
+                    
+                    %Stable ground correction?
+                    if  strcmpi(inputs.stable, 'Yes')
+                        stable_used = (interp2(stable, linspace(1,size(images{2,3},2),size(u,2)).', linspace(1,size(images{2,3},1),size(u,1))));
+                        dudiff = nanmedian(u(stable_used == 1));
+                        dvdiff = nanmedian(v(stable_used == 1));
+                        u = u - dudiff;
+                        v = v - dvdiff;
+                    end
+                                       
+                    
+                    %Again smooth the velocity matrix with a small 2 by 2
+                    %filter, interpolate over pixels removed in previous
+                    %step
+                    u = nanfillsm(u,2,2);
+                    v = nanfillsm(v,2,2);
                     
                     %Make the mask the same size as the velocity matrix
                     mask = flipud((interp2(inputs.cropmask,...
@@ -482,8 +481,11 @@ elseif strcmpi(inputs.parralelize, 'Yes')
                         linspace(1, size(images{2,3},1), size(V,1)))));
                     
                     %Mask out areas
-                    V(mask==0) = NaN;
-                    fd(mask==0) = NaN;
+                    u(mask==0) = NaN;
+                    v(mask==0) = NaN;
+                    
+                    %Save as velocity and fd
+                    [V,fd] = xytoV(u, v, stepx, stepy , dt);
                     
                     %import results to master index before loop continues. Name first
                     %row of each.

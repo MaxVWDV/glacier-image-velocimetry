@@ -175,7 +175,7 @@ if strcmpi(inputs.savearrays, 'Yes') || strcmpi(inputs.savekeyvel, 'Yes') || str
         %Next save average monthly values
         mkdir(strcat(filename,'/',inputs.name,'/Data Figures (Images)','/Average monthly values'))
         
-        % Velocity weighted average
+        % Velocity
         for images_stack_loop = 1:size(monthly_averages,1)
             %Saving hidden figure
             h = figure;set(h, 'Visible', 'off');
@@ -198,7 +198,7 @@ if strcmpi(inputs.savearrays, 'Yes') || strcmpi(inputs.savekeyvel, 'Yes') || str
                     [min(inputs.geotifflocationdata.CornerCoords.Lat) max(inputs.geotifflocationdata.CornerCoords.Lat)],monthly_averages{images_stack_loop,3});
             end
             m_grid('xtick',10,'ytick',10,'box','fancy','tickdir','in')
-            labeltextv = ['Average weighted velocity for' ' ' num2str(monthly_averages{images_stack_loop,1}),...
+            labeltextv = ['Average velocity for' ' ' num2str(monthly_averages{images_stack_loop,1}),...
                 ' ',num2str(monthly_averages{images_stack_loop,2})];
             title(labeltextv,'FontSize',25,'FontName', 'Times New Roman');
             colormap([ flipud(cbrewer('seq', 'Blues', 33));cbrewer('seq', 'Reds', 66);]);
@@ -207,79 +207,7 @@ if strcmpi(inputs.savearrays, 'Yes') || strcmpi(inputs.savekeyvel, 'Yes') || str
             ylabel(col, 'Ice Velocity (m/year)','FontSize',15,'FontName', 'Times New Roman')
             set(gcf, 'Units', 'Inches', 'Position', [0, 0, 17, 20], 'PaperUnits', 'Inches', 'PaperSize', [17, 20])
             saveas(h,strcat(filename,'/',inputs.name,'/Data Figures (Images)',...
-                '/Average monthly values/',labeltextv,'_(',monthly_averages{images_stack_loop,7},')','.',inputs.imageformat));
-        end
-        
-        
-        % Flow directions weighted average
-        
-        for images_stack_loop = 1:size(monthly_averages,1)
-            %Saving hidden figure
-            h = figure;set(h, 'Visible', 'off');
-            if strcmpi(inputs.isgeotiff,'No')
-                m_proj('lambert','lon',[inputs.minlon inputs.maxlon],'lat',[inputs.minlat inputs.maxlat]);
-                m_image([inputs.minlon inputs.maxlon],[inputs.minlat inputs.maxlat],save_image);
-                brighten(.5);
-                alpha(0.7)
-                hold on
-                m_image([inputs.minlon inputs.maxlon],[inputs.minlat inputs.maxlat],monthly_averages{images_stack_loop,4});
-            else
-                m_proj('lambert','lon',[min(inputs.geotifflocationdata.CornerCoords.Lon) max(inputs.geotifflocationdata.CornerCoords.Lon)],...
-                    'lat',[min(inputs.geotifflocationdata.CornerCoords.Lat) max(inputs.geotifflocationdata.CornerCoords.Lat)]);
-                m_image([min(inputs.geotifflocationdata.CornerCoords.Lon) max(inputs.geotifflocationdata.CornerCoords.Lon)],...
-                    [min(inputs.geotifflocationdata.CornerCoords.Lat) max(inputs.geotifflocationdata.CornerCoords.Lat)],save_image);
-                brighten(.5);
-                alpha(0.7)
-                hold on
-                m_image([min(inputs.geotifflocationdata.CornerCoords.Lon) max(inputs.geotifflocationdata.CornerCoords.Lon)],...
-                    [min(inputs.geotifflocationdata.CornerCoords.Lat) max(inputs.geotifflocationdata.CornerCoords.Lat)],monthly_averages{images_stack_loop,4});
-            end
-            m_grid('xtick',10,'ytick',10,'box','fancy','tickdir','in')
-            labeltextfd = ['Average weighted flow direction for' ' ' num2str(monthly_averages{images_stack_loop,1}),...
-                ' ',num2str(monthly_averages{images_stack_loop,2})];
-            title(labeltextfd,'FontSize',25,'FontName', 'Times New Roman');
-            colormap(crameri('romao')); caxis([0 360]);
-            hold off
-            col = colorbar;
-            ylabel(col, 'Ice Velocity (m/year)','FontSize',15,'FontName', 'Times New Roman')
-            set(gcf, 'Units', 'Inches', 'Position', [0, 0, 17, 20], 'PaperUnits', 'Inches', 'PaperSize', [17, 20])
-            saveas(h,strcat(filename,'/',inputs.name,'/Data Figures (Images)',...
-                '/Average monthly values/',labeltextfd,'_(',monthly_averages{images_stack_loop,7},')','.',inputs.imageformat));
-        end
-        
-        % Velocity median
-        for images_stack_loop = 1:size(monthly_averages,1)
-            %Saving hidden figure
-            h = figure;set(h, 'Visible', 'off');
-            if strcmpi(inputs.isgeotiff,'No')
-                m_proj('lambert','lon',[inputs.minlon inputs.maxlon],'lat',[inputs.minlat inputs.maxlat]);
-                m_image([inputs.minlon inputs.maxlon],[inputs.minlat inputs.maxlat],save_image);
-                brighten(.5);
-                alpha(0.7)
-                hold on
-                m_image([inputs.minlon inputs.maxlon],[inputs.minlat inputs.maxlat],monthly_averages{images_stack_loop,3});
-            else
-                m_proj('lambert','lon',[min(inputs.geotifflocationdata.CornerCoords.Lon) max(inputs.geotifflocationdata.CornerCoords.Lon)],...
-                    'lat',[min(inputs.geotifflocationdata.CornerCoords.Lat) max(inputs.geotifflocationdata.CornerCoords.Lat)]);
-                m_image([min(inputs.geotifflocationdata.CornerCoords.Lon) max(inputs.geotifflocationdata.CornerCoords.Lon)],...
-                    [min(inputs.geotifflocationdata.CornerCoords.Lat) max(inputs.geotifflocationdata.CornerCoords.Lat)],save_image);
-                brighten(.5);
-                alpha(0.7)
-                hold on
-                m_image([min(inputs.geotifflocationdata.CornerCoords.Lon) max(inputs.geotifflocationdata.CornerCoords.Lon)],...
-                    [min(inputs.geotifflocationdata.CornerCoords.Lat) max(inputs.geotifflocationdata.CornerCoords.Lat)],monthly_averages{images_stack_loop,5});
-            end
-            m_grid('xtick',10,'ytick',10,'box','fancy','tickdir','in')
-            labeltextv = ['Median velocity for' ' ' num2str(monthly_averages{images_stack_loop,1}),...
-                ' ',num2str(monthly_averages{images_stack_loop,2})];
-            title(labeltextv,'FontSize',25,'FontName', 'Times New Roman');
-            colormap([ flipud(cbrewer('seq', 'Blues', 33));cbrewer('seq', 'Reds', 66);]);
-            hold off
-            col = colorbar;
-            ylabel(col, 'Ice Velocity (m/year)','FontSize',15,'FontName', 'Times New Roman')
-            set(gcf, 'Units', 'Inches', 'Position', [0, 0, 17, 20], 'PaperUnits', 'Inches', 'PaperSize', [17, 20])
-            saveas(h,strcat(filename,'/',inputs.name,'/Data Figures (Images)',...
-                '/Average monthly values/',labeltextv,'_(',monthly_averages{images_stack_loop,7},')','.',inputs.imageformat));
+                '/Average monthly values/',labeltextv,'_(',monthly_averages{images_stack_loop,5},')','.',inputs.imageformat));
         end
         
         
@@ -304,10 +232,10 @@ if strcmpi(inputs.savearrays, 'Yes') || strcmpi(inputs.savekeyvel, 'Yes') || str
                 alpha(0.7)
                 hold on
                 m_image([min(inputs.geotifflocationdata.CornerCoords.Lon) max(inputs.geotifflocationdata.CornerCoords.Lon)],...
-                    [min(inputs.geotifflocationdata.CornerCoords.Lat) max(inputs.geotifflocationdata.CornerCoords.Lat)],monthly_averages{images_stack_loop,6});
+                    [min(inputs.geotifflocationdata.CornerCoords.Lat) max(inputs.geotifflocationdata.CornerCoords.Lat)],monthly_averages{images_stack_loop,4});
             end
             m_grid('xtick',10,'ytick',10,'box','fancy','tickdir','in')
-            labeltextfd = ['Median flow direction for' ' ' num2str(monthly_averages{images_stack_loop,1}),...
+            labeltextfd = ['Average flow direction for' ' ' num2str(monthly_averages{images_stack_loop,1}),...
                 ' ',num2str(monthly_averages{images_stack_loop,2})];
             title(labeltextfd,'FontSize',25,'FontName', 'Times New Roman');
             colormap(crameri('romao')); caxis([0 360]);
@@ -316,8 +244,9 @@ if strcmpi(inputs.savearrays, 'Yes') || strcmpi(inputs.savekeyvel, 'Yes') || str
             ylabel(col, 'Ice Velocity (m/year)','FontSize',15,'FontName', 'Times New Roman')
             set(gcf, 'Units', 'Inches', 'Position', [0, 0, 17, 20], 'PaperUnits', 'Inches', 'PaperSize', [17, 20])
             saveas(h,strcat(filename,'/',inputs.name,'/Data Figures (Images)',...
-                '/Average monthly values/',labeltextfd,'_(',monthly_averages{images_stack_loop,7},')','.',inputs.imageformat));
+                '/Average monthly values/',labeltextfd,'_(',monthly_averages{images_stack_loop,5},')','.',inputs.imageformat));
         end
+        
         
     end
     
@@ -351,7 +280,7 @@ if strcmpi(inputs.savearrays, 'Yes') || strcmpi(inputs.savekeyvel, 'Yes') || str
                 labeltextv = ['Average velocity for' ' ' num2str(monthly_averages{images_stack_loop,1}),...
                     ' ',num2str(monthly_averages{images_stack_loop,2})];
                 geotiffwrite(strcat(filename,'/',inputs.name,'/Georeferenced Velocity Data',...
-                    '/Average monthly values/',labeltextv,'_(',monthly_averages{images_stack_loop,7},')','.tif'),...
+                    '/Average monthly values/',labeltextv,'_(',monthly_averages{images_stack_loop,5},')','.tif'),...
                     monthly_averages{images_stack_loop,3},location_data)
             end
             
@@ -359,7 +288,7 @@ if strcmpi(inputs.savearrays, 'Yes') || strcmpi(inputs.savekeyvel, 'Yes') || str
                 labeltextfd = ['Average flow direction for' ' ' num2str(monthly_averages{images_stack_loop,1}),...
                     ' ',num2str(monthly_averages{images_stack_loop,2})];
                 geotiffwrite(strcat(filename,'/',inputs.name,'/Georeferenced Velocity Data',...
-                    '/Average monthly values/',labeltextfd,'_(',monthly_averages{images_stack_loop,7},')','.tif'),...
+                    '/Average monthly values/',labeltextfd,'_(',monthly_averages{images_stack_loop,5},')','.tif'),...
                     monthly_averages{images_stack_loop,4},location_data)
             end
         else
@@ -413,70 +342,38 @@ if strcmpi(inputs.savearrays, 'Yes') || strcmpi(inputs.savekeyvel, 'Yes') || str
             
             try
                 for images_stack_loop = 1:size(monthly_averages,1)
-                    labeltextv = ['Average weighted velocity for' ' ' num2str(monthly_averages{images_stack_loop,2}),...
+                    labeltextv = ['Average velocity for' ' ' num2str(monthly_averages{images_stack_loop,2}),...
                         ' ',num2str(monthly_averages{images_stack_loop,1})];
                     geotiffwrite(strcat(filename,'/',inputs.name,'/Georeferenced Velocity Data',...
-                        '/Average monthly values/',labeltextv,'_(',monthly_averages{images_stack_loop,7},')','.tif'),...
+                        '/Average monthly values/',labeltextv,'_(',monthly_averages{images_stack_loop,5},')','.tif'),...
                         flipud(monthly_averages{images_stack_loop,3}),inputs.geotiffreference,'GeoKeyDirectoryTag',inputs.geotifflocationdata.GeoTIFFTags.GeoKeyDirectoryTag)
                 end
                 
                 for images_stack_loop = 1:size(monthly_averages,1)
-                    labeltextfd = ['Average weighted flow direction for' ' ' num2str(monthly_averages{images_stack_loop,2}),...
+                    labeltextfd = ['Average flow direction for' ' ' num2str(monthly_averages{images_stack_loop,2}),...
                         ' ',num2str(monthly_averages{images_stack_loop,1})];
                     geotiffwrite(strcat(filename,'/',inputs.name,'/Georeferenced Velocity Data',...
-                        '/Average monthly values/',labeltextfd,'_(',monthly_averages{images_stack_loop,7},')','.tif'),...
+                        '/Average monthly values/',labeltextfd,'_(',monthly_averages{images_stack_loop,5},')','.tif'),...
                         flipud(monthly_averages{images_stack_loop,4}),inputs.geotiffreference,'GeoKeyDirectoryTag',inputs.geotifflocationdata.GeoTIFFTags.GeoKeyDirectoryTag)
-                end
-                
-                for images_stack_loop = 1:size(monthly_averages,1)
-                    labeltextv = ['Median velocity for' ' ' num2str(monthly_averages{images_stack_loop,2}),...
-                        ' ',num2str(monthly_averages{images_stack_loop,1})];
-                    geotiffwrite(strcat(filename,'/',inputs.name,'/Georeferenced Velocity Data',...
-                        '/Average monthly values/',labeltextv,'_(',monthly_averages{images_stack_loop,7},')','.tif'),...
-                        flipud(monthly_averages{images_stack_loop,5}),inputs.geotiffreference,'GeoKeyDirectoryTag',inputs.geotifflocationdata.GeoTIFFTags.GeoKeyDirectoryTag)
-                end
-                
-                for images_stack_loop = 1:size(monthly_averages,1)
-                    labeltextfd = ['Median flow direction for' ' ' num2str(monthly_averages{images_stack_loop,2}),...
-                        ' ',num2str(monthly_averages{images_stack_loop,1})];
-                    geotiffwrite(strcat(filename,'/',inputs.name,'/Georeferenced Velocity Data',...
-                        '/Average monthly values/',labeltextfd,'_(',monthly_averages{images_stack_loop,7},')','.tif'),...
-                        flipud(monthly_averages{images_stack_loop,6}),inputs.geotiffreference,'GeoKeyDirectoryTag',inputs.geotifflocationdata.GeoTIFFTags.GeoKeyDirectoryTag)
                 end
             catch
                 %edit geokey
                 geo_key_edits = inputs.geotifflocationdata.GeoTIFFTags.GeoKeyDirectoryTag;
                 geo_key_edits.GTRasterTypeGeoKey = 2;
                 for images_stack_loop = 1:size(monthly_averages,1)
-                    labeltextv = ['Average weighted velocity for' ' ' num2str(monthly_averages{images_stack_loop,2}),...
+                    labeltextv = ['Average velocity for' ' ' num2str(monthly_averages{images_stack_loop,2}),...
                         ' ',num2str(monthly_averages{images_stack_loop,1})];
                     geotiffwrite(strcat(filename,'/',inputs.name,'/Georeferenced Velocity Data',...
-                        '/Average monthly values/',labeltextv,'_(',monthly_averages{images_stack_loop,7},')','.tif'),...
+                        '/Average monthly values/',labeltextv,'_(',monthly_averages{images_stack_loop,5},')','.tif'),...
                         flipud(monthly_averages{images_stack_loop,3}),inputs.geotiffreference,'GeoKeyDirectoryTag',geo_key_edits)
                 end
                 
                 for images_stack_loop = 1:size(monthly_averages,1)
-                    labeltextfd = ['Average weighted flow direction for' ' ' num2str(monthly_averages{images_stack_loop,2}),...
+                    labeltextfd = ['Average flow direction for' ' ' num2str(monthly_averages{images_stack_loop,2}),...
                         ' ',num2str(monthly_averages{images_stack_loop,1})];
                     geotiffwrite(strcat(filename,'/',inputs.name,'/Georeferenced Velocity Data',...
-                        '/Average monthly values/',labeltextfd,'_(',monthly_averages{images_stack_loop,7},')','.tif'),...
+                        '/Average monthly values/',labeltextfd,'_(',monthly_averages{images_stack_loop,5},')','.tif'),...
                         flipud(monthly_averages{images_stack_loop,4}),inputs.geotiffreference,'GeoKeyDirectoryTag',geo_key_edits)
-                end
-                
-                for images_stack_loop = 1:size(monthly_averages,1)
-                    labeltextv = ['Median velocity for' ' ' num2str(monthly_averages{images_stack_loop,2}),...
-                        ' ',num2str(monthly_averages{images_stack_loop,1})];
-                    geotiffwrite(strcat(filename,'/',inputs.name,'/Georeferenced Velocity Data',...
-                        '/Average monthly values/',labeltextv,'_(',monthly_averages{images_stack_loop,7},')','.tif'),...
-                        flipud(monthly_averages{images_stack_loop,5}),inputs.geotiffreference,'GeoKeyDirectoryTag',geo_key_edits)
-                end
-                
-                for images_stack_loop = 1:size(monthly_averages,1)
-                    labeltextfd = ['Median flow direction for' ' ' num2str(monthly_averages{images_stack_loop,2}),...
-                        ' ',num2str(monthly_averages{images_stack_loop,1})];
-                    geotiffwrite(strcat(filename,'/',inputs.name,'/Georeferenced Velocity Data',...
-                        '/Average monthly values/',labeltextfd,'_(',monthly_averages{images_stack_loop,7},')','.tif'),...
-                        flipud(monthly_averages{images_stack_loop,6}),inputs.geotiffreference,'GeoKeyDirectoryTag',geo_key_edits)
                 end
                 
             end

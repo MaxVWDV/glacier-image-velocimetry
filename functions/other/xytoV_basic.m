@@ -1,6 +1,8 @@
-function [V,fd] = xytoV(du, dv, dx, dy, dt)
+function [V,fd] = xytoV_basic(du, dv)
 %input two direction files (x component of velocity, y component of
-%velocity), output a flow direction and a velocity magnitude
+%velocity), output a flow direction and a velocity magnitude. Assumes
+%resolution and time separation have already been accounted for (e.g. see
+%xytoV.m)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                    %% GLACIER IMAGE VELOCIMETRY (GIV) %%
@@ -24,11 +26,11 @@ function [V,fd] = xytoV(du, dv, dx, dy, dt)
                   %Feel free to contact me at vanwy048@umn.edu%
 
 %% Calculate velocity
-V= abs(((du.*dx)-(dv.*dy)*1i)/dt); %Using imaginary values to indicate direction (for convenience).
+V= abs(du-dv*1i); %Using imaginary values to indicate direction (for convenience). Faster.
 
 %% Calculate flow direction
-dir_du = (du.*dx);
-dir_dv = dv.*dy;
+dir_du = (du);
+dir_dv = dv;
 % ws = NaN*ones(size(dir_du));
 fd = NaN*ones(size(dir_du));
 e = find(~isnan(dir_du) & ~isnan(dir_dv));

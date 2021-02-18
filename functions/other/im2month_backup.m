@@ -226,78 +226,134 @@ for year_loop = first_year:last_year
             %Calculate total weight for this month
             total_monthly_weight = sum(current_month_v(:, 1));
             
-            %Decompose into x and y components
-            [u,v] = Vtoxy(current_month_v(:,2:end),current_month_fd(:,2:end));
-            
-             %Calculate a weighted mean of u
-            weighted_monthly_u = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
-            for weighting_loop = 1:size(u,1)
-                weighted_monthly_u = weighted_monthly_u + u(weighting_loop,1:end).*current_month_v(weighting_loop,1);
+            %Calculate a weighted mean of velocities
+            weighted_monthly_velocity = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
+            for weighting_loop = 1:size(current_month_v,1)
+                weighted_monthly_velocity = weighted_monthly_velocity + current_month_v(weighting_loop,2:end)*current_month_v(weighting_loop,1);
             end
             
-             %Calculate a weighted mean of v
-            weighted_monthly_v = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
-            for weighting_loop = 1:size(v,1)
-                weighted_monthly_v = weighted_monthly_v + v(weighting_loop,1:end).*current_month_v(weighting_loop,1);
-            end
+            %Calculate a weighted mean of flow directions
+            weighting = repmat(current_month_fd(:,1),1,size(current_month_fd,2)-1);
+            [weighted_monthly_fd,~] = GIV_circstats(current_month_fd(:,2:end),weighting);
+            weighted_monthly_fd(weighted_monthly_fd==0)=NaN;
             
-            %Calculate unweighted median of u
-            median_monthly_u = nanmedian(u,1);
+% % %             %A little more complex for flod directions because of the 0-360
+% % %             %boundary. We are going to again create an 'offset' flow
+% % %             %direction plot (where 0-180 become 360-540), then calculate
+% % %             %the standard devitation of each matrix. Where the 0-360
+% % %             %boundary is being crossed, standard deviation will be higher
+% % %             %and the other matix (-180) will be selected.
+% % %             
+% % %             %first create the offset flow direction
+% % %             
+% % %             current_month_fd_540 = current_month_fd;
+% % %             
+% % %             %Transpose it
+% % % 
+% % %             findless180 = (double(current_month_fd_540<180).*current_month_fd_540)+360;
+% % % 
+% % %             findless180(findless180 == 360) = 0;
+% % % 
+% % %             current_month_fd_540(current_month_fd_540<180)=0;
+% % % 
+% % %             current_month_fd_540 = current_month_fd_540 + findless180;
+% % %             
+% % %             %Now calculate the standard deviation for each array
+% % %             
+% % %             st_dev_fd = nanstd(current_month_fd,0,1);
+% % %             
+% % %             st_dev_fd_540 = nanstd(current_month_fd_540,0,1);
+% % %             
+% % %              
+% % %             %find where the standard deviation is lower in 540 array.
+% % %             
+% % %             boundary_crossed = st_dev_fd_540-st_dev_fd;
+% % %             
+% % %             boundary_crossed(boundary_crossed< 0) =1;
+% % %             
+% % %             boundary_crossed(boundary_crossed> 0) =0;
+% % %                         
+% % %             boundary_crossed(:,1)=[];
+% % %             
+% % %                         %Calculate weighted averages for each.
+% % %             
+% % %                         weighted_monthly_fd = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
+% % %             for weighting_loop = 1:size(current_month_fd,1)
+% % %                 weighted_monthly_fd = weighted_monthly_fd + current_month_fd(weighting_loop,2:end)*current_month_fd(weighting_loop,1);
+% % %             end
+% % %             
+% % %                         weighted_monthly_fd_540 = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
+% % %             for weighting_loop = 1:size(current_month_fd_540,1)
+% % %                 weighted_monthly_fd_540 = weighted_monthly_fd_540 + current_month_fd_540(weighting_loop,2:end)*current_month_fd(weighting_loop,1);
+% % %             end
+% % %             
+            %Calculate weighting in each location (to account for NaN
+            %values)
             
-            %Calculate unweighted median of v
-            median_monthly_v = nanmedian(v,1);
-            
-            %Calculate local weighting to account for NaN values
-            local_weight_u = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
-            for weighting_loop = 1:size(u,1)
-                portion = u(weighting_loop,1:end);
+            local_weight_fd = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
+            for weighting_loop = 1:size(current_month_fd,1)
+                portion = current_month_fd(weighting_loop,2:end);
                 portion(isnan(portion)) = 0;
-                portion(portion~=0)=current_month_v(weighting_loop,1);
-                local_weight_u = local_weight_u + portion;
+                portion(portion~=0)=current_month_fd(weighting_loop,1);
+                local_weight_fd = local_weight_fd + portion;
             end
             
-             local_weight_v = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
-            for weighting_loop = 1:size(v,1)
-                portion = v(weighting_loop,1:end);
+                        local_weight_v = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
+            for weighting_loop = 1:size(current_month_v,1)
+                portion = current_month_v(weighting_loop,2:end);
                 portion(isnan(portion)) = 0;
                 portion(portion~=0)=current_month_v(weighting_loop,1);
                 local_weight_v = local_weight_v + portion;
             end
+% % %             
+% % %             
+% % %             %Put the 360-540 portion back in its place.
+% % %             
+% % %             findmore360 = (double(weighted_monthly_fd_540>360).*weighted_monthly_fd_540)-360;
+% % % 
+% % %             findmore360(findmore360 == 360) = 0;
+% % % 
+% % %             weighted_monthly_fd_540(weighted_monthly_fd_540>360)=0;
+% % % 
+% % %             weighted_monthly_fd_540 = weighted_monthly_fd_540 + findmore360;
+% % %             
+% % %             
+% % %             %Replace with the _540 values where std is lower
+% % %             
+% % %             weighted_monthly_fd(boundary_crossed==1) = 0;
+% % %             
+% % %             add_part = boundary_crossed.*weighted_monthly_fd_540;
+% % %             
+% % %             weighted_monthly_fd = weighted_monthly_fd+add_part;
             
-            %Divide by weight. Wrap in if loop to avoid error if all NaN.
-            if ~isnan(nanmean(local_weight_u,'all'))
+            %
+            
+            if ~isnan(nanmean(local_weight_fd,'all'))
                 
-                weighted_monthly_u = weighted_monthly_u./local_weight_u;
-                
+            
+            
+            
+            weighted_monthly_velocity = weighted_monthly_velocity./local_weight_v;
+            
+
+%             weighted_monthly_fd = weighted_monthly_fd./local_weight_fd;
             end
-            
-            if ~isnan(nanmean(local_weight_v,'all'))
-                
-                weighted_monthly_v = weighted_monthly_v./local_weight_v;
-                
-            end
-            
-            %Infill isolated NaNs and do some slight smoothing
-            weighted_monthly_u = nanfillsm(weighted_monthly_u, 4,3);
-            weighted_monthly_v = nanfillsm(weighted_monthly_v, 4,3);
-            
-            median_monthly_u = nanfillsm(median_monthly_u, 4,3);
-            median_monthly_v = nanfillsm(median_monthly_v, 4,3);
             
             %We now have a linear matrix with the weighted velocities, we
             %simply need to make it the right shape.
-            weighted_monthly_u = (reshape(weighted_monthly_u,inputs.sizevel));
-            weighted_monthly_v = (reshape(weighted_monthly_v,inputs.sizevel));
             
-            median_monthly_u = (reshape(median_monthly_u,inputs.sizevel));
-            median_monthly_v = (reshape(median_monthly_v,inputs.sizevel));
+            weighted_monthly_velocity = (reshape(weighted_monthly_velocity,inputs.sizevel)); %flipud
             
-            %Convert to weighted velocity and flow direction stats
-            [weighted_monthly_velocity,weighted_monthly_fd] = xytoV_basic(weighted_monthly_u,weighted_monthly_v);
-            
-            %Convert to median velocity and flow direction stats
-            [median_monthly_velocity,median_monthly_fd] = xytoV_basic(median_monthly_u,median_monthly_v);
+                        weighted_monthly_fd = (reshape(weighted_monthly_fd,inputs.sizevel));%flipud
 
+            
+            %Infill isolated NaNs and do some slight smoothing
+            
+            weighted_monthly_velocity = nanfillsm(weighted_monthly_velocity, 4,3);
+            
+                        weighted_monthly_fd = nanfillsm(weighted_monthly_fd, 4,3);
+
+            
             %Finally we need to load the data into the outputs array. First
             %we determine the position we are at in this array:
             
@@ -311,33 +367,25 @@ for year_loop = first_year:last_year
             %Second column is the month
             monthly_averages{position_in_array,2} = month_loop;
             
-            %Third column is the mean weighted velocity
+            %Third column is the mean velocity
             monthly_averages{position_in_array,3} = weighted_monthly_velocity;
             
-            %Fourth column is the mean weighted flow direction
+            %Fourth column is the mean flow direction
             monthly_averages{position_in_array,4} = weighted_monthly_fd;
             
-            %Fifth column is the median velocity
-            monthly_averages{position_in_array,5} = median_monthly_velocity;
-            
-            %Sixth column is the median flow direction
-            monthly_averages{position_in_array,6} = median_monthly_fd;
-            
-            %Seventh column is the quality of data for this month, as
+            %Fifth column is the quality of data for this month, as
             %determined from the total monthly weight. This uses the
             %following formula:
             %Low Reliability data : total monthly weight <= 1
             %Moderate Reliability data : 1 < total monthly weight <= 2.5
             %High Reliability data : 2.5 < total monthly weight 
             if total_monthly_weight <= 1
-               monthly_averages{position_in_array,7} = 'Low Reliability data';
+               monthly_averages{position_in_array,5} = 'Low Reliability data';
             elseif 1 < total_monthly_weight <= 2.5
-               monthly_averages{position_in_array,7} = 'Moderate Reliability data';
+               monthly_averages{position_in_array,5} = 'Moderate Reliability data';
             elseif 2.5 < total_monthly_weight
-               monthly_averages{position_in_array,7} = 'High Reliability data';
+               monthly_averages{position_in_array,5} = 'High Reliability data';
             end    
-
- 
 
         end
 
@@ -447,78 +495,133 @@ for year_loop = first_year:last_year
             %Calculate total weight for this month
             total_monthly_weight = sum(current_month_v(:, 1));
             
-            %Decompose into x and y components
-            [u,v] = Vtoxy(current_month_v(:,2:end),current_month_fd(:,2:end));
-            
-             %Calculate a weighted mean of u
-            weighted_monthly_u = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
-            for weighting_loop = 1:size(u,1)
-                weighted_monthly_u = weighted_monthly_u + u(weighting_loop,1:end).*current_month_v(weighting_loop,1);
+            %Calculate a weighted mean of velocities
+            weighted_monthly_velocity = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
+            for weighting_loop = 1:size(current_month_v,1)
+                weighted_monthly_velocity = weighted_monthly_velocity + current_month_v(weighting_loop,2:end)*current_month_v(weighting_loop,1);
             end
             
-             %Calculate a weighted mean of v
-            weighted_monthly_v = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
-            for weighting_loop = 1:size(v,1)
-                weighted_monthly_v = weighted_monthly_v + v(weighting_loop,1:end).*current_month_v(weighting_loop,1);
-            end
+            %Calculate a weighted mean of flow directions
+            weighting = repmat(current_month_fd(:,1),1,size(current_month_fd,2)-1);
+            [weighted_monthly_fd,~] = GIV_circstats(current_month_fd(:,2:end),weighting);
+            weighted_monthly_fd(weighted_monthly_fd==0)=NaN;
             
-            %Calculate unweighted median of u
-            median_monthly_u = nanmedian(u,1);
-            
-            %Calculate unweighted median of v
-            median_monthly_v = nanmedian(v,1);
-            
-            %Calculate local weighting to account for NaN values
-            local_weight_u = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
-            for weighting_loop = 1:size(u,1)
-                portion = u(weighting_loop,1:end);
+% % % %             %A little more complex for flod directions because of the 0-360
+% % % %             %boundary. We are going to again create an 'offset' flow
+% % % %             %direction plot (where 0-180 become 360-540), then calculate
+% % % %             %the standard devitation of each matrix. Where the 0-360
+% % % %             %boundary is being crossed, standard deviation will be higher
+% % % %             %and the other matix (-180) will be selected.
+% % % %             
+% % % %             %first create the offset flow direction
+% % % %             
+% % % %             current_month_fd_540 = current_month_fd;
+% % % %             
+% % % %             %Transpose it
+% % % % 
+% % % %             findless180 = (double(current_month_fd_540<180).*current_month_fd_540)+360;
+% % % % 
+% % % %             findless180(findless180 == 360) = 0;
+% % % % 
+% % % %             current_month_fd_540(current_month_fd_540<180)=0;
+% % % % 
+% % % %             current_month_fd_540 = current_month_fd_540 + findless180;
+% % % %             
+% % % %             %Now calculate the standard deviation for each array
+% % % %             
+% % % %             st_dev_fd = nanstd(current_month_fd,0,1);
+% % % %             
+% % % %             st_dev_fd_540 = nanstd(current_month_fd_540,0,1);
+% % % %             
+% % % %              
+% % % %             %find where the standard deviation is lower in 540 array.
+% % % %             
+% % % %             boundary_crossed = st_dev_fd_540-st_dev_fd;
+% % % %             
+% % % %             boundary_crossed(boundary_crossed< 0) =1;
+% % % %             
+% % % %             boundary_crossed(boundary_crossed> 0) =0;
+% % % %                         
+% % % %             boundary_crossed(:,1)=[];
+% % % %             
+% % % %                         %Calculate weighted averages for each.
+% % % %             
+% % % %                         weighted_monthly_fd = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
+% % % %             for weighting_loop = 1:size(current_month_fd,1)
+% % % %                 weighted_monthly_fd = weighted_monthly_fd + current_month_fd(weighting_loop,2:end)*current_month_fd(weighting_loop,1);
+% % % %             end
+% % % %             
+% % % %                         weighted_monthly_fd_540 = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
+% % % %             for weighting_loop = 1:size(current_month_fd_540,1)
+% % % %                 weighted_monthly_fd_540 = weighted_monthly_fd_540 + current_month_fd_540(weighting_loop,2:end)*current_month_fd(weighting_loop,1);
+% % % %             end
+% % % %             
+            %Calculate weighting in each location (to account for NaN
+            %values)
+            local_weight_fd = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
+            for weighting_loop = 1:size(current_month_fd,1)
+                portion = current_month_fd(weighting_loop,2:end);
                 portion(isnan(portion)) = 0;
-                portion(portion~=0)=current_month_v(weighting_loop,1);
-                local_weight_u = local_weight_u + portion;
+                portion(portion~=0)=current_month_fd(weighting_loop,1);
+                local_weight_fd = local_weight_fd + portion;
             end
             
-             local_weight_v = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
-            for weighting_loop = 1:size(v,1)
-                portion = v(weighting_loop,1:end);
+                                    local_weight_v = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
+            for weighting_loop = 1:size(current_month_v,1)
+                portion = current_month_v(weighting_loop,2:end);
                 portion(isnan(portion)) = 0;
                 portion(portion~=0)=current_month_v(weighting_loop,1);
                 local_weight_v = local_weight_v + portion;
             end
+% % % %             
+% % % %             %Put the 360-540 portion back in its place.
+% % % %             
+% % % %             findmore360 = (double(weighted_monthly_fd_540>360).*weighted_monthly_fd_540)-360;
+% % % % 
+% % % %             findmore360(findmore360 == 360) = 0;
+% % % % 
+% % % %             weighted_monthly_fd_540(weighted_monthly_fd_540>360)=0;
+% % % % 
+% % % %             weighted_monthly_fd_540 = weighted_monthly_fd_540 + findmore360;
+% % % %             
+% % % %             
+% % % %             %Replace with the _540 values where std is lower
+% % % %             
+% % % %             weighted_monthly_fd(boundary_crossed==1) = 0;
+% % % %             
+% % % %             add_part = boundary_crossed.*weighted_monthly_fd_540;
+% % % %             
+% % % %             weighted_monthly_fd = weighted_monthly_fd+add_part;
             
-            %Divide by weight. Wrap in if loop to avoid error if all NaN.
-            if ~isnan(nanmean(local_weight_u,'all'))
+            %
+                  
+            if ~isnan(nanmean(local_weight_fd,'all'))
                 
-                weighted_monthly_u = weighted_monthly_u./local_weight_u;
-                
+            
+            
+            
+            weighted_monthly_velocity = weighted_monthly_velocity./local_weight_v;
+            
+
+%             weighted_monthly_fd = weighted_monthly_fd./local_weight_fd;
             end
-            
-            if ~isnan(nanmean(local_weight_v,'all'))
-                
-                weighted_monthly_v = weighted_monthly_v./local_weight_v;
-                
-            end
-            
-            %Infill isolated NaNs and do some slight smoothing
-            weighted_monthly_u = nanfillsm(weighted_monthly_u, 4,3);
-            weighted_monthly_v = nanfillsm(weighted_monthly_v, 4,3);
-            
-            median_monthly_u = nanfillsm(median_monthly_u, 4,3);
-            median_monthly_v = nanfillsm(median_monthly_v, 4,3);
+
             
             %We now have a linear matrix with the weighted velocities, we
             %simply need to make it the right shape.
-            weighted_monthly_u = (reshape(weighted_monthly_u,inputs.sizevel));
-            weighted_monthly_v = (reshape(weighted_monthly_v,inputs.sizevel));
             
-            median_monthly_u = (reshape(median_monthly_u,inputs.sizevel));
-            median_monthly_v = (reshape(median_monthly_v,inputs.sizevel));
+            weighted_monthly_velocity = (reshape(weighted_monthly_velocity,inputs.sizevel)); %flipud
             
-            %Convert to weighted velocity and flow direction stats
-            [weighted_monthly_velocity,weighted_monthly_fd] = xytoV_basic(weighted_monthly_u,weighted_monthly_v);
-            
-            %Convert to median velocity and flow direction stats
-            [median_monthly_velocity,median_monthly_fd] = xytoV_basic(median_monthly_u,median_monthly_v);
+                        weighted_monthly_fd = (reshape(weighted_monthly_fd,inputs.sizevel)); %flipud
 
+            
+            %Infill isolated NaNs and do some slight smoothing
+            
+            weighted_monthly_velocity = nanfillsm(weighted_monthly_velocity, 4,3);
+            
+                        weighted_monthly_fd = nanfillsm(weighted_monthly_fd, 4,3);
+
+            
             %Finally we need to load the data into the outputs array. First
             %we determine the position we are at in this array:
             
@@ -532,30 +635,24 @@ for year_loop = first_year:last_year
             %Second column is the month
             monthly_averages{position_in_array,2} = month_loop;
             
-            %Third column is the mean weighted velocity
+            %Third column is the mean velocity
             monthly_averages{position_in_array,3} = weighted_monthly_velocity;
             
-            %Fourth column is the mean weighted flow direction
+            %Fourth column is the mean flow direction
             monthly_averages{position_in_array,4} = weighted_monthly_fd;
             
-            %Fifth column is the median velocity
-            monthly_averages{position_in_array,5} = median_monthly_velocity;
-            
-            %Sixth column is the median flow direction
-            monthly_averages{position_in_array,6} = median_monthly_fd;
-            
-            %Seventh column is the quality of data for this month, as
+            %Fifth column is the quality of data for this month, as
             %determined from the total monthly weight. This uses the
             %following formula:
             %Low Reliability data : total monthly weight <= 1
             %Moderate Reliability data : 1 < total monthly weight <= 2.5
             %High Reliability data : 2.5 < total monthly weight 
             if total_monthly_weight <= 1
-               monthly_averages{position_in_array,7} = 'Low Reliability data';
+               monthly_averages{position_in_array,5} = 'Low Reliability data';
             elseif 1 < total_monthly_weight <= 2.5
-               monthly_averages{position_in_array,7} = 'Moderate Reliability data';
+               monthly_averages{position_in_array,5} = 'Moderate Reliability data';
             elseif 2.5 < total_monthly_weight
-               monthly_averages{position_in_array,7} = 'High Reliability data';
+               monthly_averages{position_in_array,5} = 'High Reliability data';
             end     
             
         end
@@ -664,78 +761,133 @@ for year_loop = first_year:last_year
             %Calculate total weight for this month
             total_monthly_weight = sum(current_month_v(:, 1));
             
-            %Decompose into x and y components
-            [u,v] = Vtoxy(current_month_v(:,2:end),current_month_fd(:,2:end));
-            
-             %Calculate a weighted mean of u
-            weighted_monthly_u = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
-            for weighting_loop = 1:size(u,1)
-                weighted_monthly_u = weighted_monthly_u + u(weighting_loop,1:end).*current_month_v(weighting_loop,1);
+            %Calculate a weighted mean of velocities
+            weighted_monthly_velocity = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
+            for weighting_loop = 1:size(current_month_v,1)
+                weighted_monthly_velocity = weighted_monthly_velocity + current_month_v(weighting_loop,2:end)*current_month_v(weighting_loop,1);
             end
             
-             %Calculate a weighted mean of v
-            weighted_monthly_v = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
-            for weighting_loop = 1:size(v,1)
-                weighted_monthly_v = weighted_monthly_v + v(weighting_loop,1:end).*current_month_v(weighting_loop,1);
-            end
+            %Calculate a weighted mean of flow directions
+            weighting = repmat(current_month_fd(:,1),1,size(current_month_fd,2)-1);
+            [weighted_monthly_fd,~] = GIV_circstats(current_month_fd(:,2:end),weighting);
+            weighted_monthly_fd(weighted_monthly_fd==0)=NaN;
             
-            %Calculate unweighted median of u
-            median_monthly_u = nanmedian(u,1);
-            
-            %Calculate unweighted median of v
-            median_monthly_v = nanmedian(v,1);
-            
-            %Calculate local weighting to account for NaN values
-            local_weight_u = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
-            for weighting_loop = 1:size(u,1)
-                portion = u(weighting_loop,1:end);
+% % % %             %A little more complex for flod directions because of the 0-360
+% % % %             %boundary. We are going to again create an 'offset' flow
+% % % %             %direction plot (where 0-180 become 360-540), then calculate
+% % % %             %the standard devitation of each matrix. Where the 0-360
+% % % %             %boundary is being crossed, standard deviation will be higher
+% % % %             %and the other matix (-180) will be selected.
+% % % %             
+% % % %             %first create the offset flow direction
+% % % %             
+% % % %             current_month_fd_540 = current_month_fd;
+% % % %             
+% % % %             %Transpose it
+% % % % 
+% % % %             findless180 = (double(current_month_fd_540<180).*current_month_fd_540)+360;
+% % % % 
+% % % %             findless180(findless180 == 360) = 0;
+% % % % 
+% % % %             current_month_fd_540(current_month_fd_540<180)=0;
+% % % % 
+% % % %             current_month_fd_540 = current_month_fd_540 + findless180;
+% % % %             
+% % % %             %Now calculate the standard deviation for each array
+% % % %             
+% % % %             st_dev_fd = nanstd(current_month_fd,0,1);
+% % % %             
+% % % %             st_dev_fd_540 = nanstd(current_month_fd_540,0,1);
+% % % %             
+% % % %              
+% % % %             %find where the standard deviation is lower in 540 array.
+% % % %             
+% % % %             boundary_crossed = st_dev_fd_540-st_dev_fd;
+% % % %             
+% % % %             boundary_crossed(boundary_crossed< 0) =1;
+% % % %             
+% % % %             boundary_crossed(boundary_crossed> 0) =0;
+% % % %                         
+% % % %             boundary_crossed(:,1)=[];
+% % % %             
+% % % %                         %Calculate weighted averages for each.
+% % % %             
+% % % %                         weighted_monthly_fd = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
+% % % %             for weighting_loop = 1:size(current_month_fd,1)
+% % % %                 weighted_monthly_fd = weighted_monthly_fd + current_month_fd(weighting_loop,2:end)*current_month_fd(weighting_loop,1);
+% % % %             end
+% % % %             
+% % % %                         weighted_monthly_fd_540 = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
+% % % %             for weighting_loop = 1:size(current_month_fd_540,1)
+% % % %                 weighted_monthly_fd_540 = weighted_monthly_fd_540 + current_month_fd_540(weighting_loop,2:end)*current_month_fd(weighting_loop,1);
+% % % %             end
+% % % %             
+            %Calculate weighting in each location (to account for NaN
+            %values)
+            local_weight_fd = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
+            for weighting_loop = 1:size(current_month_fd,1)
+                portion = current_month_fd(weighting_loop,2:end);
                 portion(isnan(portion)) = 0;
-                portion(portion~=0)=current_month_v(weighting_loop,1);
-                local_weight_u = local_weight_u + portion;
+                portion(portion~=0)=current_month_fd(weighting_loop,1);
+                local_weight_fd = local_weight_fd + portion;
             end
             
-             local_weight_v = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
-            for weighting_loop = 1:size(v,1)
-                portion = v(weighting_loop,1:end);
+                                    local_weight_v = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
+            for weighting_loop = 1:size(current_month_v,1)
+                portion = current_month_v(weighting_loop,2:end);
                 portion(isnan(portion)) = 0;
                 portion(portion~=0)=current_month_v(weighting_loop,1);
                 local_weight_v = local_weight_v + portion;
             end
+% % % %             
+% % % %             %Put the 360-540 portion back in its place.
+% % % %             
+% % % %             findmore360 = (double(weighted_monthly_fd_540>360).*weighted_monthly_fd_540)-360;
+% % % % 
+% % % %             findmore360(findmore360 == 360) = 0;
+% % % % 
+% % % %             weighted_monthly_fd_540(weighted_monthly_fd_540>360)=0;
+% % % % 
+% % % %             weighted_monthly_fd_540 = weighted_monthly_fd_540 + findmore360;
+% % % %             
+% % % %             
+% % % %             %Replace with the _540 values where std is lower
+% % % %             
+% % % %             weighted_monthly_fd(boundary_crossed==1) = 0;
+% % % %             
+% % % %             add_part = boundary_crossed.*weighted_monthly_fd_540;
+% % % %             
+% % % %             weighted_monthly_fd = weighted_monthly_fd+add_part;
             
-            %Divide by weight. Wrap in if loop to avoid error if all NaN.
-            if ~isnan(nanmean(local_weight_u,'all'))
+            %
+                  
+            if ~isnan(nanmean(local_weight_fd,'all'))
                 
-                weighted_monthly_u = weighted_monthly_u./local_weight_u;
-                
+            
+            
+            
+            weighted_monthly_velocity = weighted_monthly_velocity./local_weight_v;
+            
+
+%             weighted_monthly_fd = weighted_monthly_fd./local_weight_fd;
             end
-            
-            if ~isnan(nanmean(local_weight_v,'all'))
-                
-                weighted_monthly_v = weighted_monthly_v./local_weight_v;
-                
-            end
-            
-            %Infill isolated NaNs and do some slight smoothing
-            weighted_monthly_u = nanfillsm(weighted_monthly_u, 4,3);
-            weighted_monthly_v = nanfillsm(weighted_monthly_v, 4,3);
-            
-            median_monthly_u = nanfillsm(median_monthly_u, 4,3);
-            median_monthly_v = nanfillsm(median_monthly_v, 4,3);
+
             
             %We now have a linear matrix with the weighted velocities, we
             %simply need to make it the right shape.
-            weighted_monthly_u = (reshape(weighted_monthly_u,inputs.sizevel));
-            weighted_monthly_v = (reshape(weighted_monthly_v,inputs.sizevel));
             
-            median_monthly_u = (reshape(median_monthly_u,inputs.sizevel));
-            median_monthly_v = (reshape(median_monthly_v,inputs.sizevel));
+            weighted_monthly_velocity = (reshape(weighted_monthly_velocity,inputs.sizevel)); %flipud
             
-            %Convert to weighted velocity and flow direction stats
-            [weighted_monthly_velocity,weighted_monthly_fd] = xytoV_basic(weighted_monthly_u,weighted_monthly_v);
-            
-            %Convert to median velocity and flow direction stats
-            [median_monthly_velocity,median_monthly_fd] = xytoV_basic(median_monthly_u,median_monthly_v);
+                        weighted_monthly_fd = (reshape(weighted_monthly_fd,inputs.sizevel)); %flipud
 
+            
+            %Infill isolated NaNs and do some slight smoothing
+            
+            weighted_monthly_velocity = nanfillsm(weighted_monthly_velocity, 4,3);
+            
+                        weighted_monthly_fd = nanfillsm(weighted_monthly_fd, 4,3);
+
+            
             %Finally we need to load the data into the outputs array. First
             %we determine the position we are at in this array:
             
@@ -749,30 +901,24 @@ for year_loop = first_year:last_year
             %Second column is the month
             monthly_averages{position_in_array,2} = month_loop;
             
-            %Third column is the mean weighted velocity
+            %Third column is the mean velocity
             monthly_averages{position_in_array,3} = weighted_monthly_velocity;
             
-            %Fourth column is the mean weighted flow direction
+            %Fourth column is the mean flow direction
             monthly_averages{position_in_array,4} = weighted_monthly_fd;
             
-            %Fifth column is the median velocity
-            monthly_averages{position_in_array,5} = median_monthly_velocity;
-            
-            %Sixth column is the median flow direction
-            monthly_averages{position_in_array,6} = median_monthly_fd;
-            
-            %Seventh column is the quality of data for this month, as
+            %Fifth column is the quality of data for this month, as
             %determined from the total monthly weight. This uses the
             %following formula:
             %Low Reliability data : total monthly weight <= 1
             %Moderate Reliability data : 1 < total monthly weight <= 2.5
             %High Reliability data : 2.5 < total monthly weight 
             if total_monthly_weight <= 1
-               monthly_averages{position_in_array,7} = 'Low Reliability data';
+               monthly_averages{position_in_array,5} = 'Low Reliability data';
             elseif 1 < total_monthly_weight <= 2.5
-               monthly_averages{position_in_array,7} = 'Moderate Reliability data';
+               monthly_averages{position_in_array,5} = 'Moderate Reliability data';
             elseif 2.5 < total_monthly_weight
-               monthly_averages{position_in_array,7} = 'High Reliability data';
+               monthly_averages{position_in_array,5} = 'High Reliability data';
             end      
             
         end
@@ -883,78 +1029,133 @@ for year_loop = first_year:last_year
             %Calculate total weight for this month
             total_monthly_weight = sum(current_month_v(:, 1));
             
-            %Decompose into x and y components
-            [u,v] = Vtoxy(current_month_v(:,2:end),current_month_fd(:,2:end));
-            
-             %Calculate a weighted mean of u
-            weighted_monthly_u = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
-            for weighting_loop = 1:size(u,1)
-                weighted_monthly_u = weighted_monthly_u + u(weighting_loop,1:end).*current_month_v(weighting_loop,1);
+            %Calculate a weighted mean of velocities
+            weighted_monthly_velocity = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
+            for weighting_loop = 1:size(current_month_v,1)
+                weighted_monthly_velocity = weighted_monthly_velocity + current_month_v(weighting_loop,2:end)*current_month_v(weighting_loop,1);
             end
             
-             %Calculate a weighted mean of v
-            weighted_monthly_v = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
-            for weighting_loop = 1:size(v,1)
-                weighted_monthly_v = weighted_monthly_v + v(weighting_loop,1:end).*current_month_v(weighting_loop,1);
-            end
+            %Calculate a weighted mean of flow directions
+            weighting = repmat(current_month_fd(:,1),1,size(current_month_fd,2)-1);
+            [weighted_monthly_fd,~] = GIV_circstats(current_month_fd(:,2:end),weighting);
+            weighted_monthly_fd(weighted_monthly_fd==0)=NaN;
             
-            %Calculate unweighted median of u
-            median_monthly_u = nanmedian(u,1);
-            
-            %Calculate unweighted median of v
-            median_monthly_v = nanmedian(v,1);
-            
-            %Calculate local weighting to account for NaN values
-            local_weight_u = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
-            for weighting_loop = 1:size(u,1)
-                portion = u(weighting_loop,1:end);
+% % % %             %A little more complex for flod directions because of the 0-360
+% % % %             %boundary. We are going to again create an 'offset' flow
+% % % %             %direction plot (where 0-180 become 360-540), then calculate
+% % % %             %the standard devitation of each matrix. Where the 0-360
+% % % %             %boundary is being crossed, standard deviation will be higher
+% % % %             %and the other matix (-180) will be selected.
+% % % %             
+% % % %             %first create the offset flow direction
+% % % %             
+% % % %             current_month_fd_540 = current_month_fd;
+% % % %             
+% % % %             %Transpose it
+% % % % 
+% % % %             findless180 = (double(current_month_fd_540<180).*current_month_fd_540)+360;
+% % % % 
+% % % %             findless180(findless180 == 360) = 0;
+% % % % 
+% % % %             current_month_fd_540(current_month_fd_540<180)=0;
+% % % % 
+% % % %             current_month_fd_540 = current_month_fd_540 + findless180;
+% % % %             
+% % % %             %Now calculate the standard deviation for each array
+% % % %             
+% % % %             st_dev_fd = nanstd(current_month_fd,0,1);
+% % % %             
+% % % %             st_dev_fd_540 = nanstd(current_month_fd_540,0,1);
+% % % %             
+% % % %              
+% % % %             %find where the standard deviation is lower in 540 array.
+% % % %             
+% % % %             boundary_crossed = st_dev_fd_540-st_dev_fd;
+% % % %             
+% % % %             boundary_crossed(boundary_crossed< 0) =1;
+% % % %             
+% % % %             boundary_crossed(boundary_crossed> 0) =0;
+% % % %                         
+% % % %             boundary_crossed(:,1)=[];
+% % % %             
+% % % %             %Calculate weighted averages for each.
+% % % %             
+% % % %                         weighted_monthly_fd = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
+% % % %             for weighting_loop = 1:size(current_month_fd,1)
+% % % %                 weighted_monthly_fd = weighted_monthly_fd + current_month_fd(weighting_loop,2:end)*current_month_fd(weighting_loop,1);
+% % % %             end
+% % % %             
+% % % %                         weighted_monthly_fd_540 = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
+% % % %             for weighting_loop = 1:size(current_month_fd_540,1)
+% % % %                 weighted_monthly_fd_540 = weighted_monthly_fd_540 + current_month_fd_540(weighting_loop,2:end)*current_month_fd(weighting_loop,1);
+% % % %             end
+% % % %             
+            %Calculate weighting in each location (to account for NaN
+            %values)
+            local_weight_fd = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
+            for weighting_loop = 1:size(current_month_fd,1)
+                portion = current_month_fd(weighting_loop,2:end);
                 portion(isnan(portion)) = 0;
-                portion(portion~=0)=current_month_v(weighting_loop,1);
-                local_weight_u = local_weight_u + portion;
+                portion(portion~=0)=current_month_fd(weighting_loop,1);
+                local_weight_fd = local_weight_fd + portion;
             end
             
-             local_weight_v = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
-            for weighting_loop = 1:size(v,1)
-                portion = v(weighting_loop,1:end);
+                                    local_weight_v = zeros(1,inputs.sizevel(1)*inputs.sizevel(2));
+            for weighting_loop = 1:size(current_month_v,1)
+                portion = current_month_v(weighting_loop,2:end);
                 portion(isnan(portion)) = 0;
                 portion(portion~=0)=current_month_v(weighting_loop,1);
                 local_weight_v = local_weight_v + portion;
             end
+% % % %             
+% % % %             %Put the 360-540 portion back in its place.
+% % % %             
+% % % %             findmore360 = (double(weighted_monthly_fd_540>360).*weighted_monthly_fd_540)-360;
+% % % % 
+% % % %             findmore360(findmore360 == 360) = 0;
+% % % % 
+% % % %             weighted_monthly_fd_540(weighted_monthly_fd_540>360)=0;
+% % % % 
+% % % %             weighted_monthly_fd_540 = weighted_monthly_fd_540 + findmore360;
+% % % %             
+% % % %             
+% % % %             %Replace with the _540 values where std is lower
+% % % %             
+% % % %             weighted_monthly_fd(boundary_crossed==1) = 0;
+% % % %             
+% % % %             add_part = boundary_crossed.*weighted_monthly_fd_540;
+% % % %             
+% % % %             weighted_monthly_fd = weighted_monthly_fd+add_part;
             
-            %Divide by weight. Wrap in if loop to avoid error if all NaN.
-            if ~isnan(nanmean(local_weight_u,'all'))
+            %
+                  
+            if ~isnan(nanmean(local_weight_fd,'all'))
                 
-                weighted_monthly_u = weighted_monthly_u./local_weight_u;
-                
+            
+            
+            
+            weighted_monthly_velocity = weighted_monthly_velocity./local_weight_v;
+            
+
+%             weighted_monthly_fd = weighted_monthly_fd./local_weight_fd;
             end
-            
-            if ~isnan(nanmean(local_weight_v,'all'))
-                
-                weighted_monthly_v = weighted_monthly_v./local_weight_v;
-                
-            end
-            
-            %Infill isolated NaNs and do some slight smoothing
-            weighted_monthly_u = nanfillsm(weighted_monthly_u, 4,3);
-            weighted_monthly_v = nanfillsm(weighted_monthly_v, 4,3);
-            
-            median_monthly_u = nanfillsm(median_monthly_u, 4,3);
-            median_monthly_v = nanfillsm(median_monthly_v, 4,3);
+
             
             %We now have a linear matrix with the weighted velocities, we
             %simply need to make it the right shape.
-            weighted_monthly_u = (reshape(weighted_monthly_u,inputs.sizevel));
-            weighted_monthly_v = (reshape(weighted_monthly_v,inputs.sizevel));
             
-            median_monthly_u = (reshape(median_monthly_u,inputs.sizevel));
-            median_monthly_v = (reshape(median_monthly_v,inputs.sizevel));
+            weighted_monthly_velocity = (reshape(weighted_monthly_velocity,inputs.sizevel)); %flipud
             
-            %Convert to weighted velocity and flow direction stats
-            [weighted_monthly_velocity,weighted_monthly_fd] = xytoV_basic(weighted_monthly_u,weighted_monthly_v);
-            
-            %Convert to median velocity and flow direction stats
-            [median_monthly_velocity,median_monthly_fd] = xytoV_basic(median_monthly_u,median_monthly_v);
+                        weighted_monthly_fd = (reshape(weighted_monthly_fd,inputs.sizevel)); %flipud
 
+            
+            %Infill isolated NaNs and do some slight smoothing
+            
+            weighted_monthly_velocity = nanfillsm(weighted_monthly_velocity, 4,3);
+            
+            weighted_monthly_fd = nanfillsm(weighted_monthly_fd, 4,3);
+
+            
             %Finally we need to load the data into the outputs array. First
             %we determine the position we are at in this array:
             
@@ -968,30 +1169,24 @@ for year_loop = first_year:last_year
             %Second column is the month
             monthly_averages{position_in_array,2} = month_loop;
             
-            %Third column is the mean weighted velocity
+            %Third column is the mean velocity
             monthly_averages{position_in_array,3} = weighted_monthly_velocity;
             
-            %Fourth column is the mean weighted flow direction
+            %Fourth column is the mean flow direction
             monthly_averages{position_in_array,4} = weighted_monthly_fd;
             
-            %Fifth column is the median velocity
-            monthly_averages{position_in_array,5} = median_monthly_velocity;
-            
-            %Sixth column is the median flow direction
-            monthly_averages{position_in_array,6} = median_monthly_fd;
-            
-            %Seventh column is the quality of data for this month, as
+            %Fifth column is the quality of data for this month, as
             %determined from the total monthly weight. This uses the
             %following formula:
             %Low Reliability data : total monthly weight <= 1
             %Moderate Reliability data : 1 < total monthly weight <= 2.5
             %High Reliability data : 2.5 < total monthly weight 
             if total_monthly_weight <= 1
-               monthly_averages{position_in_array,7} = 'Low Reliability data';
+               monthly_averages{position_in_array,5} = 'Low Reliability data';
             elseif 1 < total_monthly_weight <= 2.5
-               monthly_averages{position_in_array,7} = 'Moderate Reliability data';
+               monthly_averages{position_in_array,5} = 'Moderate Reliability data';
             elseif 2.5 < total_monthly_weight
-               monthly_averages{position_in_array,7} = 'High Reliability data';
+               monthly_averages{position_in_array,5} = 'High Reliability data';
             end       
             
         end

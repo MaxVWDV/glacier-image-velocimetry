@@ -1,7 +1,6 @@
-function [V,fd] = xytoV(du, dv, dx, dy, dt)
-%input two direction files (x component of velocity, y component of
-%velocity), output a flow direction and a velocity magnitude
-
+function [u,v] = Vtoxy(V,fd)
+%input a flow direction and a velocity magnitude, output two direction
+%files (x component of velocity, y component of velocity)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                    %% GLACIER IMAGE VELOCIMETRY (GIV) %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -22,32 +21,8 @@ function [V,fd] = xytoV(du, dv, dx, dy, dt)
                         %Version 0.9, Spring 2021%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                   %Feel free to contact me at vanwy048@umn.edu%
+                  
+[u,v]=pol2cart(deg2rad(360-(fd-90)),V); %0 & 360 is defined as N
 
-%% Calculate velocity
-V= abs(((du.*dx)-(dv.*dy)*1i)/dt); %Using imaginary values to indicate direction (for convenience).
+end
 
-%% Calculate flow direction
-dir_du = (du.*dx);
-dir_dv = dv.*dy;
-% ws = NaN*ones(size(dir_du));
-fd = NaN*ones(size(dir_du));
-e = find(~isnan(dir_du) & ~isnan(dir_dv));
-% ws(e) = sqrt(dir_du(e).*dir_du(e) + dir_dv(e).*dir_dv(e));
-fd(e) = (180/pi)*atan2(dir_dv(e),dir_du(e));
-temp1=fd;
-temp1(fd>0) = 0;
-temp1 = abs(temp1);
-temp1(temp1==0)=-90;
-temp1=temp1+90;
-temp2 = fd;
-temp2(fd<0) = 0;
-temp2=360-temp2;
-temp2(temp2==360)=0;
-temp2=temp2+90;
-temp2(temp2==90)=0;
-temp3=temp2;
-temp3(temp3<360)=0;
-temp3=temp3-360;
-temp3(temp3==-360)=0;
-temp2(temp2>360)=0;
-fd = temp1+temp2+temp3;

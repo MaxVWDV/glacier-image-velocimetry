@@ -131,8 +131,8 @@ for jj=1:((1-overlap)*winsize):sy-winsize+1
                     
                 end
                 % signal to noise:
-                snr=R(max_y1,max_x1)/R2(p2_y2,p2_x2);
-                snr2=R(max_y1,max_x1)/nanmean(abs(R),'all');
+                pkr=R(max_y1,max_x1)/R2(p2_y2,p2_x2);
+                snr=R(max_y1,max_x1)/nanmean(abs(R),'all');
                 
                 
                 %%%%%%%%%%%%%%%%%%%%%% Store the displacements, SnR and Peak Height.
@@ -140,8 +140,8 @@ for jj=1:((1-overlap)*winsize):sy-winsize+1
                 vp(cj,ci)=(-y0+initialdy(cj,ci));
                 xp(cj,ci)=(ii+(M/2)-1);
                 yp(cj,ci)=(jj+(winsize/2)-1);
-                SnR(cj,ci)=snr;
-                SnR2(cj,ci)=snr2;
+                SnR(cj,ci)=pkr;
+                SnR2(cj,ci)=snr;
                 Pkh(cj,ci)=R(max_y1,max_x1);
             else
                 up(cj,ci)=NaN; vp(cj,ci)=NaN; SnR(cj,ci)=NaN; Pkh(cj,ci)=0;
