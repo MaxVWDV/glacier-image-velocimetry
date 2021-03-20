@@ -186,6 +186,7 @@ if strcmpi(inputs.parralelize, 'No')
             if exist('parralel_chip') == 1 && ...
                     size(parralel_chip,1) == Num_cores | (time_loop == inputs.temporaloversampling && inner_loop == inputs.numimages-time_loop)
                 
+                %parralelized loop. Requires a slightly different code structure.
                 for inner_loop_parralel = 1:size(parralel_chip,1)
                     A1= parralel_chip{inner_loop_parralel,1};
                     B1= parralel_chip{inner_loop_parralel,2};
@@ -285,7 +286,7 @@ if strcmpi(inputs.parralelize, 'No')
                     newcol1{inner_loop_parralel,1}=V;
                     newcol2{inner_loop_parralel,1}=fd;
                     
-                end %for end
+                end %parfor end
                 
                 %write to array to save velocity and flow direction maps.
                 column_save_variable2 = column_save_variable + size(newcol1,1) -1;
@@ -324,18 +325,33 @@ if strcmpi(inputs.parralelize, 'No')
                     text_percent = ['Approximatively'  ' '  num2str(percent_completed)  '%'  ' '  'of image pairs calculated and' ' ' num2str(remaining_time) ' ' 'hours remaining.'];
                 end
                 
+                %Remove previous message if it exists
                 if exist('message_1', 'var')
                     delete(message_1);
                     clear('message_1');
                 end
                 
+                %Create pop up message box with duration remaining.
                 message_1 = msgbox(text_percent,...
                     'GIV is running','custom',logo);
-                
-                %Display time remaining
-                disp(text_percent);
                 parralel_chip = {};
-                parralel_timestep = 1;
+                
+%                 parralel_timestep = 1;
+                
+%                 %This section in case one worked in the parralel pool 'dies' during
+%                 % a long calculation. Should reboot the full parralel pool.
+%                 core_info = gcp('nocreate');
+%                 try
+%                     current_cores = core_info.NumWorkers;
+%                 catch
+%                     current_cores = 0;
+%                 end
+%                 clear core_info
+%                 
+%                 if current_cores < Num_cores
+%                     delete(gcp('nocreate'))
+%                     parpool(Num_cores)
+%                 end
                 
                 
             end
@@ -345,6 +361,7 @@ if strcmpi(inputs.parralelize, 'No')
         emptycount_inner = 0;
         
     end
+    
     
     
     %Or run it in parralel
@@ -391,7 +408,9 @@ elseif strcmpi(inputs.parralelize, 'Yes')
             
             if exist('parralel_chip') == 1 && ...
                     size(parralel_chip,1) == Num_cores | (time_loop == inputs.temporaloversampling && inner_loop == inputs.numimages-time_loop)
-                
+
+                newcol1 = cell(size(parralel_chip,1),1);
+                newcol2 = cell(size(parralel_chip,1),1);
                 %parralelized loop. Requires a slightly different code structure.
                 parfor inner_loop_parralel = 1:size(parralel_chip,1)
                     A1= parralel_chip{inner_loop_parralel,1};
@@ -451,8 +470,8 @@ elseif strcmpi(inputs.parralelize, 'Yes')
                     
                     % First pass with a small window size and higher tolerance to fill
                     % small gaps:
-                    u = nanfillsm(u,2,2);
-                    v = nanfillsm(v,2,2);
+                    u = nanfill(u,2,2);
+                    v = nanfill(v,2,2);
                     
                     
                     V(V > inputs.maxvel) = -1;
@@ -472,8 +491,8 @@ elseif strcmpi(inputs.parralelize, 'Yes')
                     %Again smooth the velocity matrix with a small 2 by 2
                     %filter, interpolate over pixels removed in previous
                     %step
-                    u = nanfillsm(u,2,2);
-                    v = nanfillsm(v,2,2);
+                    u = nanfill(u,2,2);
+                    v = nanfill(v,2,2);
                     
                     %Make the mask the same size as the velocity matrix
                     mask = flipud((interp2(inputs.cropmask,...

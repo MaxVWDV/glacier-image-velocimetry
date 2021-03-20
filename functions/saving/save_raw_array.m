@@ -43,6 +43,8 @@ mkdir(strcat(filename,'/',inputs.name,'/Initial data backup'))
 
 %Save images, Inputs, Images_stack and Monthly_averages in this folder
 
+save(strcat(filename,'/',inputs.name,'/Initial data backup/','Run Input Parameters'),'inputs');
+
 save(strcat(filename,'/',inputs.name,'/Initial data backup/','Raw Images array'),'images','-v7.3');
 end
 

@@ -110,6 +110,8 @@ full_v(:,1:2)=[];
 
 num_stand_dev = 2; %Number of standard deviations to consider outliers. Set to 2 by default
 
+
+%%%%%%%%%%%%%%%% First, x and y components
 %u (x velocity component).
 mean_u = nanmean(full_u);
 std_u = nanstd(full_u);
@@ -160,6 +162,73 @@ full_v(out_limits_u==1)=NaN;
 full_u(out_limits_v==1)=NaN;
 full_v(out_limits_v==1)=NaN;
 
+
+
+%%%%%%%%%%%%%%%% Next Velocity and Standard deviation
+
+%recalculate Vel and flowdir
+[full_vel,full_fd]...
+    =xytoV_basic(full_u,full_v);
+
+
+%Calculate mean and standard deviation using circular statistics
+[mean_fd,std_fd] = GIV_circstats(full_fd);
+
+% find points in the stack that are more than 2 standard deviations outside
+% of the mean.
+low_fd = mean_fd - 2 * std_fd;
+templow_fd = mean_fd - 2 * std_fd;
+high_fd = mean_fd + 2 * std_fd;
+temphigh_fd = mean_fd + 2 * std_fd;
+%Find if any are out of 0-360 circle
+poslow = low_fd<0;
+poshigh = temphigh_fd>360;
+%flip where needed
+high_fd(poslow)=360+templow_fd(poslow);
+low_fd(poslow)=temphigh_fd(poslow);
+low_fd(poshigh)=temphigh_fd(poshigh)-360;
+high_fd(poshigh)=templow_fd(poshigh);
+
+%make full arrays of limits
+full_low_fd = [];
+full_high_fd = [];
+for index = 1:size(full_fd,1)
+    full_low_fd(index,:) = low_fd;
+    full_high_fd(index,:) = high_fd;
+end
+
+% where is it out of limit in BOTH (i.e. not caused by the boundary)
+out_limits_fd = double((double(full_fd<full_low_fd)+double(full_fd>full_high_fd))>=1);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Secondly, lets do this for the velocities.
+mean_vel = nanmean(full_vel);
+std_vel = nanstd(full_vel);
+
+% find points in the stack that are more than 2 standard deviations outside
+% of the mean.
+low_vel = mean_vel - 2 * std_vel;
+high_vel = mean_vel + 2 * std_vel;
+full_low_vel = [];
+full_high_vel = [];
+
+for index = 1:size(full_vel,1) %make full arrays of limits
+    full_low_vel(index,:) = low_vel;
+    full_high_vel(index,:) = high_vel;
+end
+
+out_limits_low_vel = double(full_vel < full_low_vel);
+out_limits_high_vel = double(full_vel > full_high_vel);
+out_limits_vel = double((out_limits_low_vel + out_limits_high_vel)>=1);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%remove values more than 2 std away from mean in data
+full_v(out_limits_fd==1)=NaN;
+full_u(out_limits_fd==1)=NaN;
+full_v(out_limits_vel==1)=NaN;
+full_u(out_limits_vel==1)=NaN;
+
+
 %% Filter data in time and space if requested
 
 
@@ -189,12 +258,12 @@ median_u = nanmedian(full_u);
 median_v = nanmedian(full_v);
 
 %local smoothing and NaN filling
-mean_u = nanfillsm(mean_u, 4,3);
-mean_v = nanfillsm(mean_v, 4,3);
-std_u = nanfillsm(std_u, 4,3);
-std_v = nanfillsm(std_v, 4,3);
-median_u = nanfillsm(median_u, 4,3);
-median_v = nanfillsm(median_v, 4,3);
+mean_u = nanfill(mean_u, 4,3);
+mean_v = nanfill(mean_v, 4,3);
+std_u = nanfill(std_u, 4,3);
+std_v = nanfill(std_v, 4,3);
+median_u = nanfill(median_u, 4,3);
+median_v = nanfill(median_v, 4,3);
 
 
 

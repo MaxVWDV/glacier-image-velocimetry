@@ -87,6 +87,10 @@ end
 %cloudy images, but often not necessary when images are already orientation
 %filtered.
 if inputs.CLAHE == 1
+    
+    in = rescale(in); %Rescale to 0-1, necessary for CLAHE
+    
+    
     numberoftiles1=round(size(in,1)/inputs.CLAHEsize);
     numberoftiles2=round(size(in,2)/inputs.CLAHEsize);
     

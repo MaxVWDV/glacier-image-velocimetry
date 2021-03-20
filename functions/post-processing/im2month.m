@@ -278,11 +278,11 @@ for year_loop = first_year:last_year
             end
             
             %Infill isolated NaNs and do some slight smoothing
-            weighted_monthly_u = nanfillsm(weighted_monthly_u, 4,3);
-            weighted_monthly_v = nanfillsm(weighted_monthly_v, 4,3);
+            weighted_monthly_u = nanfill(weighted_monthly_u, 4,3);
+            weighted_monthly_v = nanfill(weighted_monthly_v, 4,3);
             
-            median_monthly_u = nanfillsm(median_monthly_u, 4,3);
-            median_monthly_v = nanfillsm(median_monthly_v, 4,3);
+            median_monthly_u = nanfill(median_monthly_u, 4,3);
+            median_monthly_v = nanfill(median_monthly_v, 4,3);
             
             %We now have a linear matrix with the weighted velocities, we
             %simply need to make it the right shape.
@@ -499,11 +499,11 @@ for year_loop = first_year:last_year
             end
             
             %Infill isolated NaNs and do some slight smoothing
-            weighted_monthly_u = nanfillsm(weighted_monthly_u, 4,3);
-            weighted_monthly_v = nanfillsm(weighted_monthly_v, 4,3);
+            weighted_monthly_u = nanfill(weighted_monthly_u, 4,3);
+            weighted_monthly_v = nanfill(weighted_monthly_v, 4,3);
             
-            median_monthly_u = nanfillsm(median_monthly_u, 4,3);
-            median_monthly_v = nanfillsm(median_monthly_v, 4,3);
+            median_monthly_u = nanfill(median_monthly_u, 4,3);
+            median_monthly_v = nanfill(median_monthly_v, 4,3);
             
             %We now have a linear matrix with the weighted velocities, we
             %simply need to make it the right shape.
@@ -716,11 +716,11 @@ for year_loop = first_year:last_year
             end
             
             %Infill isolated NaNs and do some slight smoothing
-            weighted_monthly_u = nanfillsm(weighted_monthly_u, 4,3);
-            weighted_monthly_v = nanfillsm(weighted_monthly_v, 4,3);
+            weighted_monthly_u = nanfill(weighted_monthly_u, 4,3);
+            weighted_monthly_v = nanfill(weighted_monthly_v, 4,3);
             
-            median_monthly_u = nanfillsm(median_monthly_u, 4,3);
-            median_monthly_v = nanfillsm(median_monthly_v, 4,3);
+            median_monthly_u = nanfill(median_monthly_u, 4,3);
+            median_monthly_v = nanfill(median_monthly_v, 4,3);
             
             %We now have a linear matrix with the weighted velocities, we
             %simply need to make it the right shape.
@@ -935,11 +935,11 @@ for year_loop = first_year:last_year
             end
             
             %Infill isolated NaNs and do some slight smoothing
-            weighted_monthly_u = nanfillsm(weighted_monthly_u, 4,3);
-            weighted_monthly_v = nanfillsm(weighted_monthly_v, 4,3);
+            weighted_monthly_u = nanfill(weighted_monthly_u, 4,3);
+            weighted_monthly_v = nanfill(weighted_monthly_v, 4,3);
             
-            median_monthly_u = nanfillsm(median_monthly_u, 4,3);
-            median_monthly_v = nanfillsm(median_monthly_v, 4,3);
+            median_monthly_u = nanfill(median_monthly_u, 4,3);
+            median_monthly_v = nanfill(median_monthly_v, 4,3);
             
             %We now have a linear matrix with the weighted velocities, we
             %simply need to make it the right shape.
@@ -1387,7 +1387,7 @@ for iterations = 1:inputs.nummonthiter
              end
          end %end findoutlier loop
          
-        one_month_v_temp(numbering_system_temp,:) = reshape(nanfillsm(reshape(nanmean(one_month_v_temp(numbering_system_temp,:),1)...
+        one_month_v_temp(numbering_system_temp,:) = reshape(nanfill(reshape(nanmean(one_month_v_temp(numbering_system_temp,:),1)...
             ,inputs.sizevel),2,2),[1,inputs.sizevel(1)*inputs.sizevel(2)]); %fill some of the NaNs
         
 %     numbering_system_temp = numbering_system_temp+1;    
@@ -1527,7 +1527,7 @@ for iterations = 1:inputs.nummonthiter
              end
          end %end findoutlier loop
          
-        one_month_v_temp(numbering_system_temp,:) = reshape(nanfillsm(reshape(nanmean(one_month_v_temp(numbering_system_temp,:),1)...
+        one_month_v_temp(numbering_system_temp,:) = reshape(nanfill(reshape(nanmean(one_month_v_temp(numbering_system_temp,:),1)...
             ,inputs.sizevel),2,2),[1,inputs.sizevel(1)*inputs.sizevel(2)]); %fill some of the NaNs
        
 %        numbering_system_temp = numbering_system_temp+1; 
@@ -1557,8 +1557,8 @@ end % end of iterative loop
 
 
     for i = 1:size(monthly_averages,1) %Infill isolated NaNs and do some slight smoothing
-        monthly_averages{i,3} = nanfillsm(monthly_averages{i,3}, 3,3);
-        monthly_averages{i,4} = nanfillsm(monthly_averages{i,4}, 3,3);
+        monthly_averages{i,3} = nanfill(monthly_averages{i,3}, 3,3);
+        monthly_averages{i,4} = nanfill(monthly_averages{i,4}, 3,3);
     end
 
 

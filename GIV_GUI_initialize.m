@@ -969,7 +969,7 @@ GUIinputs = [];
             
             %Prompt user to select file
             load_file = uigetfile('input files', 'Select an input file you previously saved.')
-            load(strcat(load_file,'/',file_name),'inputs');
+            load(load_file,'inputs');
             
             %Display message
             logo = imread('GIV_LOGO_SMALL.png');
@@ -1107,7 +1107,7 @@ GUIinputs = [];
             inputs = GUIinputs;
             
             %Save the file
-            filename2 = strcat(inputs{1,2},'/input files');
+            filename2 = strcat(inputs.folder,'/input files');
             if ~exist(filename2)
                 mkdir(filename2)
             end

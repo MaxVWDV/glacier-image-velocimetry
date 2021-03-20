@@ -107,7 +107,7 @@ end
 %% This portion performs the pre-processing and crops to mask
 %It can be done in parralel for speed:
 if strcmpi(inputs.parralelize, 'Yes')
-    newcol = {};
+    newcol = cell(size(images,1),3);
 
     parfor l = 2:size(images,1)
         a1 = double(imageprefilter(images{l,3}, inputs)); 
