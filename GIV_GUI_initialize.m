@@ -968,8 +968,8 @@ GUIinputs = [];
         function [btn,event]= plotButtonPushed3(btn)
             
             %Prompt user to select file
-            load_file = uigetfile('input files', 'Select an input file you previously saved.')
-            load(load_file,'inputs');
+            [fname,load_file] = uigetfile('input files', 'Select an input file you previously saved.');
+            load(strcat(load_file,'/',fname),'inputs');
             
             %Display message
             logo = imread('GIV_LOGO_SMALL.png');
