@@ -26,9 +26,9 @@ function [images,inputs]=GIVcore(images,inputs)
 %with the same conditions as this.
 
 % Read the associated paper here:
-% https://doi.org/10.5194/tc-2020-204
+% doi.org/10.5194/tc-15-2115-2021
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Version 0.7, Autumn 2020%
+%Version 1.0, Spring-Summer 2021%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Feel free to contact me at vanwy048@umn.edu%
 
@@ -208,7 +208,7 @@ if strcmpi(inputs.parralelize, 'No')
                             max_d = max_expected;
                         end
                         
-                        [u,v,snr,pkr]=GIVtrack(A1,B1,inputs,max_d,inputs.idealresolution);
+                        [u,v,snr,pkr]=GIVtrack(A1,B1,inputs,max_d);
                     else
                         disp('Check bottom of inputs file for single or multipass entry')
                     end
@@ -261,7 +261,7 @@ if strcmpi(inputs.parralelize, 'No')
                         u = u - dudiff;
                         v = v - dvdiff;
                     end
-                                       
+                    
                     
                     %Again smooth the velocity matrix with a small 2 by 2
                     %filter, interpolate over pixels removed in previous
@@ -274,9 +274,9 @@ if strcmpi(inputs.parralelize, 'No')
                         linspace(1, size(images{2,3},2), size(V,2)).',...
                         linspace(1, size(images{2,3},1), size(V,1)))));
                     
-                    %Mask out areas
-                    u(mask==0) = NaN;
-                    v(mask==0) = NaN;
+                    %                     %Mask out areas
+                    %                     u(mask==0) = NaN;
+                    %                     v(mask==0) = NaN;
                     
                     %Save as velocity and fd
                     [V,fd] = xytoV(u, v, stepx, stepy , dt);
@@ -336,22 +336,22 @@ if strcmpi(inputs.parralelize, 'No')
                     'GIV is running','custom',logo);
                 parralel_chip = {};
                 
-%                 parralel_timestep = 1;
+                %                 parralel_timestep = 1;
                 
-%                 %This section in case one worked in the parralel pool 'dies' during
-%                 % a long calculation. Should reboot the full parralel pool.
-%                 core_info = gcp('nocreate');
-%                 try
-%                     current_cores = core_info.NumWorkers;
-%                 catch
-%                     current_cores = 0;
-%                 end
-%                 clear core_info
-%                 
-%                 if current_cores < Num_cores
-%                     delete(gcp('nocreate'))
-%                     parpool(Num_cores)
-%                 end
+                %                 %This section in case one worked in the parralel pool 'dies' during
+                %                 % a long calculation. Should reboot the full parralel pool.
+                %                 core_info = gcp('nocreate');
+                %                 try
+                %                     current_cores = core_info.NumWorkers;
+                %                 catch
+                %                     current_cores = 0;
+                %                 end
+                %                 clear core_info
+                %
+                %                 if current_cores < Num_cores
+                %                     delete(gcp('nocreate'))
+                %                     parpool(Num_cores)
+                %                 end
                 
                 
             end
@@ -408,7 +408,7 @@ elseif strcmpi(inputs.parralelize, 'Yes')
             
             if exist('parralel_chip') == 1 && ...
                     size(parralel_chip,1) == Num_cores | (time_loop == inputs.temporaloversampling && inner_loop == inputs.numimages-time_loop)
-
+                
                 newcol1 = cell(size(parralel_chip,1),1);
                 newcol2 = cell(size(parralel_chip,1),1);
                 %parralelized loop. Requires a slightly different code structure.
@@ -433,7 +433,7 @@ elseif strcmpi(inputs.parralelize, 'Yes')
                             max_d = max_expected;
                         end
                         
-                        [u,v,snr,pkr]=GIVtrack(A1,B1,inputs,max_d,inputs.idealresolution);
+                        [u,v,snr,pkr]=GIVtrack(A1,B1,inputs,max_d);
                     else
                         disp('Check bottom of inputs file for single or multipass entry')
                     end
@@ -486,7 +486,7 @@ elseif strcmpi(inputs.parralelize, 'Yes')
                         u = u - dudiff;
                         v = v - dvdiff;
                     end
-                                       
+                    
                     
                     %Again smooth the velocity matrix with a small 2 by 2
                     %filter, interpolate over pixels removed in previous
@@ -499,9 +499,9 @@ elseif strcmpi(inputs.parralelize, 'Yes')
                         linspace(1, size(images{2,3},2), size(V,2)).',...
                         linspace(1, size(images{2,3},1), size(V,1)))));
                     
-                    %Mask out areas
-                    u(mask==0) = NaN;
-                    v(mask==0) = NaN;
+                    %                     %Mask out areas
+                    %                     u(mask==0) = NaN;
+                    %                     v(mask==0) = NaN;
                     
                     %Save as velocity and fd
                     [V,fd] = xytoV(u, v, stepx, stepy , dt);

@@ -13,6 +13,8 @@ function GIV_GUI_timeseries()
 % 4 = Yes or no for calculate for monthly data
 % 
 % 5 = flow direction and velocity or just velocity
+%
+%Run with no inputs or outputs (just type the word)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -30,9 +32,9 @@ function GIV_GUI_timeseries()
 %with the same conditions as this.
 
 % Read the associated paper here: 
-% https://doi.org/10.5194/tc-2020-204
+% doi.org/10.5194/tc-15-2115-2021
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                        %Version 0.7, Autumn 2020%
+                        %Version 1.0, Spring-Summer 2021%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                   %Feel free to contact me at vanwy048@umn.edu%
 

@@ -29,9 +29,9 @@ function [u,v]=fillnan2(u,v,mask,xx,yy)
 %with the same conditions as this.
 
 % Read the associated paper here: 
-% https://doi.org/10.5194/tc-2020-204
+% doi.org/10.5194/tc-15-2115-2021
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                        %Version 0.7, Autumn 2020%
+                        %Version 1.0, Spring-Summer 2021%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                   %Feel free to contact me at vanwy048@umn.edu%
 

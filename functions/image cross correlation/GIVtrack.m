@@ -13,10 +13,11 @@ function [du, dv,snr,pkr]=GIVtrack(A,B,inputs,max_d)
 %                region is an estimate of the noise level.
 %   pu,pv: actual pixel centers of templates in A may differ from inputs because of rounding.
 %
-%
+% Note: In my experience, the multipass solver generally produces better
+% results than this single pass solver
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% GLACIER IMAGE VELOCIMETRY (GIV) %%
+                   %% GLACIER IMAGE VELOCIMETRY (GIV) %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Code written by Max Van Wyk de Vries @ University of Minnesota
 %Credit to Ben Popken and Andrew Wickert for portions of the toolbox.
@@ -24,20 +25,20 @@ function [du, dv,snr,pkr]=GIVtrack(A,B,inputs,max_d)
 %Portions of this toolbox are based on a number of codes written by
 %previous authors, including matPIV, IMGRAFT, PIVLAB, M_Map and more.
 %Credit and thanks are due to the authors of these toolboxes, and for
-%sharing their codes online. See the user manual for a full list of third
+%sharing their codes online. See the user manual for a full list of third 
 %party codes used here. Accordingly, you are free to share, edit and
-%add to this GIV code. Please give us credit if you do, and share your code
+%add to this GIV code. Please give us credit if you do, and share your code 
 %with the same conditions as this.
 
-% Read the associated paper here:
-% https://doi.org/10.5194/tc-2020-204
+% Read the associated paper here: 
+% doi.org/10.5194/tc-15-2115-2021
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Version 0.8, Spring 2021%
+                        %Version 1.0, Spring-Summer 2021%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Feel free to contact me at vanwy048@umn.edu%
+                  %Feel free to contact me at vanwy048@umn.edu%
 
 
-%Largely based on function 'templatematch' by Alsak Grinstead, part of
+%Based on function 'templatematch' by Alsak Grinstead, part of
 %the ImGRAFT toolbox. See his website below for details.
 
 % ImGRAFT - An image georectification and feature tracking toolbox for MATLAB

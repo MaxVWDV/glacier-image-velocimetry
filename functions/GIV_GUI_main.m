@@ -20,7 +20,7 @@ function GIV_GUI_main(inputs)
 % or recovered if the run crashes or is interrupted.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                   %% GLACIER IMAGE VELOCIMETRY (GIV) %%
+%% GLACIER IMAGE VELOCIMETRY (GIV) %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Code written by Max Van Wyk de Vries @ University of Minnesota
 %Credit to Ben Popken and Andrew Wickert for portions of the toolbox.
@@ -28,19 +28,19 @@ function GIV_GUI_main(inputs)
 %Portions of this toolbox are based on a number of codes written by
 %previous authors, including matPIV, IMGRAFT, PIVLAB, M_Map and more.
 %Credit and thanks are due to the authors of these toolboxes, and for
-%sharing their codes online. See the user manual for a full list of third 
+%sharing their codes online. See the user manual for a full list of third
 %party codes used here. Accordingly, you are free to share, edit and
-%add to this GIV code. Please give us credit if you do, and share your code 
+%add to this GIV code. Please give us credit if you do, and share your code
 %with the same conditions as this.
 
-% Read the associated paper here: 
-% https://doi.org/10.5194/tc-2020-204
+% Read the associated paper here:
+% doi.org/10.5194/tc-15-2115-2021
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                        %Version 0.7, Autumn 2020%
+%Version 1.0, Spring-Summer 2021%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                  %Feel free to contact me at vanwy048@umn.edu%
+%Feel free to contact me at vanwy048@umn.edu%
 
-                  
+
 %% Load image series
 % Loads all of the images from a folder.
 
@@ -67,8 +67,8 @@ message_1 = msgbox({'Images loaded and cropped to mask.';'Calculating glacier ve
 
 %Delete previous message box if has not been closed.
 if exist('message_1', 'var')
-  delete(message_1);
-  clear('message_1');
+    delete(message_1);
+    clear('message_1');
 end
 
 %Save raw feature tracking results so that they can be recovered if
@@ -81,7 +81,7 @@ message_2 = msgbox('Velocity pairs calculated. Filtering and saving entire datas
     'GIV is running','custom',logo);
 
 
-%% Filter based on entire dataset 
+%% Filter based on entire dataset
 %Perform post-processing
 
 [images,images_stack]=filtall(images,inputs);
@@ -100,8 +100,8 @@ message_2 = msgbox('Velocity pairs calculated. Filtering and saving entire datas
 
 %Delete previous message box if has not been closed.
 if exist('message_2', 'var')
-  delete(message_2);
-  clear('message_2');
+    delete(message_2);
+    clear('message_2');
 end
 
 %Let the user know that GIV is finished.

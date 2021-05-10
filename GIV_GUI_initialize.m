@@ -15,7 +15,8 @@ function GIV_GUI_initialize()
 %etc. Portions were generated automatically using MATLAB's app builder. You
 %can tweak it to improve layout if you like, but I would not recommend
 %changing it very much. 
-
+%
+%Run with no inputs or outputs (just type the word)
 
 
 
@@ -35,9 +36,9 @@ function GIV_GUI_initialize()
 %with the same conditions as this.
 
 % Read the associated paper here: 
-% https://doi.org/10.5194/tc-2020-204
+% doi.org/10.5194/tc-15-2115-2021
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                        %Version 0.7, Autumn 2020%
+                        %Version 1.0, Spring-Summer 2021%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                   %Feel free to contact me at vanwy048@umn.edu%
 
@@ -968,8 +969,8 @@ GUIinputs = [];
         function [btn,event]= plotButtonPushed3(btn)
             
             %Prompt user to select file
-            load_file = uigetfile('input files', 'Select an input file you previously saved.')
-            load(load_file,'inputs');
+            [fname,load_file] = uigetfile('input files', 'Select an input file you previously saved.');
+            load(strcat(load_file,'/',fname),'inputs');
             
             %Display message
             logo = imread('GIV_LOGO_SMALL.png');

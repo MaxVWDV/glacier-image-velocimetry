@@ -2,7 +2,7 @@ function [x0,y0]=GIVtrackmultipeak(x1,y1,R,Rxm1,Rxp1,Rym1,Ryp1,method,N)
 %
 % INTPEAK - sub-pixel peak finder
 %
-% function [x0,y0]=intpeak(x1,x2,x3,y1,y2,y3,method,N)
+% function [x0,y0]=GIVtrackmultipeak(x1,x2,x3,y1,y2,y3,method,N)
 % METHOD = 
 % 1 for centroid fit, 
 % 2 for gaussian fit, 
@@ -31,9 +31,9 @@ function [x0,y0]=GIVtrackmultipeak(x1,y1,R,Rxm1,Rxp1,Rym1,Ryp1,method,N)
 %with the same conditions as this.
 
 % Read the associated paper here: 
-% https://doi.org/10.5194/tc-2020-204
+% doi.org/10.5194/tc-15-2115-2021
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                        %Version 0.7, Autumn 2020%
+                        %Version 1.0, Spring-Summer 2021%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                   %Feel free to contact me at vanwy048@umn.edu%
 

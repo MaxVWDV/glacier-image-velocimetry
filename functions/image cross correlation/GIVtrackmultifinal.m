@@ -14,7 +14,7 @@ function [up,vp,SnR2,SnR]=GIVtrackmultifinal(A,B,winsize,overlap,initialdx,initi
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% GLACIER IMAGE VELOCIMETRY (GIV) %%
+                   %% GLACIER IMAGE VELOCIMETRY (GIV) %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Code written by Max Van Wyk de Vries @ University of Minnesota
 %Credit to Ben Popken and Andrew Wickert for portions of the toolbox.
@@ -22,17 +22,17 @@ function [up,vp,SnR2,SnR]=GIVtrackmultifinal(A,B,winsize,overlap,initialdx,initi
 %Portions of this toolbox are based on a number of codes written by
 %previous authors, including matPIV, IMGRAFT, PIVLAB, M_Map and more.
 %Credit and thanks are due to the authors of these toolboxes, and for
-%sharing their codes online. See the user manual for a full list of third
+%sharing their codes online. See the user manual for a full list of third 
 %party codes used here. Accordingly, you are free to share, edit and
-%add to this GIV code. Please give us credit if you do, and share your code
+%add to this GIV code. Please give us credit if you do, and share your code 
 %with the same conditions as this.
 
-% Read the associated paper here:
-% https://doi.org/10.5194/tc-2020-204
+% Read the associated paper here: 
+% doi.org/10.5194/tc-15-2115-2021
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Version 0.7, Autumn 2020%
+                        %Version 1.0, Spring-Summer 2021%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Feel free to contact me at vanwy048@umn.edu%
+                  %Feel free to contact me at vanwy048@umn.edu%
 
 if length(winsize)==1
     M=winsize;
@@ -107,6 +107,7 @@ for jj=1:((1-overlap)*winsize):sy-winsize+1
                 [x0, y0]=GIVtrackmultipeak(max_x1,max_y1,R(max_y1,max_x1),...
                     R(max_y1,max_x1-1),R(max_y1,max_x1+1),...
                     R(max_y1-1,max_x1),R(max_y1+1,max_x1),3,[M,winsize]);
+
                 
                 % Find the signal to Noise ratio
                 R2=R;
@@ -119,20 +120,23 @@ for jj=1:((1-overlap)*winsize):sy-winsize+1
                 catch
                     R2(max_y1-1:max_y1+1,max_x1-1:max_x1+1)=NaN;
                 end
+                
                 if size(R,1)==(winsize-1)
                     [p2_y2,p2_x2]=find(R2==max(R2(:)));
                 else
                     [p2_y2,p2_x2]=find(R2==max(max(R2(0.5*winsize:1.5*winsize-1,0.5*M:1.5*M-1))));
                 end
+                
                 if length(p2_x2)>1
                     p2_x2=p2_x2(round(length(p2_x2)/2));
                     p2_y2=p2_y2(round(length(p2_y2)/2));
-                elseif isempty(p2_x2)
+                    
                     
                 end
+                
                 % signal to noise:
-                pkr=R(max_y1,max_x1)/R2(p2_y2,p2_x2);
-                snr=R(max_y1,max_x1)/nanmean(abs(R),'all');
+                    pkr=R(max_y1,max_x1)/R2(p2_y2,p2_x2);
+                    snr=R(max_y1,max_x1)/nanmean(abs(R),'all');
                 
                 
                 %%%%%%%%%%%%%%%%%%%%%% Store the displacements, SnR and Peak Height.

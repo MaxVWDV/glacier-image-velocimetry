@@ -21,29 +21,28 @@ function [images,inputs]=cropmask(images,inputs)
 %
 %This should be named mask (.png) and saved in the same folder as the rest
 %of the timeseries.
+%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                    %% GLACIER IMAGE VELOCIMETRY (GIV) %%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %Code written by Max Van Wyk de Vries @ University of Minnesota
+% %Credit to Ben Popken and Andrew Wickert for portions of the toolbox.
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %Portions of this toolbox are based on a number of codes written by
+% %previous authors, including matPIV, IMGRAFT, PIVLAB, M_Map and more.
+% %Credit and thanks are due to the authors of these toolboxes, and for
+% %sharing their codes online. See the user manual for a full list of third 
+% %party codes used here. Accordingly, you are free to share, edit and
+% %add to this GIV code. Please give us credit if you do, and share your code 
+% %with the same conditions as this.
+% 
+% % Read the associated paper here: 
+% % doi.org/10.5194/tc-15-2115-2021
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                         %Version 1.0, Spring-Summer 2021%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                   %Feel free to contact me at vanwy048@umn.edu%
 
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                   %% GLACIER IMAGE VELOCIMETRY (GIV) %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Code written by Max Van Wyk de Vries @ University of Minnesota
-%Credit to Ben Popken and Andrew Wickert for portions of the toolbox.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Portions of this toolbox are based on a number of codes written by
-%previous authors, including matPIV, IMGRAFT, PIVLAB, M_Map and more.
-%Credit and thanks are due to the authors of these toolboxes, and for
-%sharing their codes online. See the user manual for a full list of third 
-%party codes used here. Accordingly, you are free to share, edit and
-%add to this GIV code. Please give us credit if you do, and share your code 
-%with the same conditions as this.
-
-% Read the associated paper here: 
-% https://doi.org/10.5194/tc-2020-204
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                        %Version 0.7, Autumn 2020%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                  %Feel free to contact me at vanwy048@umn.edu%
                   
 
 % Read the mask. It can be a .png or .jpg. Shapefile masks should be added

@@ -5,28 +5,27 @@ function [images, images_stack]=filtall(images,inputs)
 % %individual velocity maps- including the knowledge that glacier velocity
 % %will be smoothly varying through time (no jumps) and will only vary at a
 % %relatively slow rate in general.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% GLACIER IMAGE VELOCIMETRY (GIV) %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Code written by Max Van Wyk de Vries @ University of Minnesota
-%Credit to Ben Popken and Andrew Wickert for portions of the toolbox.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Portions of this toolbox are based on a number of codes written by
-%previous authors, including matPIV, IMGRAFT, PIVLAB, M_Map and more.
-%Credit and thanks are due to the authors of these toolboxes, and for
-%sharing their codes online. See the user manual for a full list of third
-%party codes used here. Accordingly, you are free to share, edit and
-%add to this GIV code. Please give us credit if you do, and share your code
-%with the same conditions as this.
-
-% Read the associated paper here:
-% https://doi.org/10.5194/tc-2020-204
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Version 0.7, Autumn 2020%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Feel free to contact me at vanwy048@umn.edu%
+%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                    %% GLACIER IMAGE VELOCIMETRY (GIV) %%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %Code written by Max Van Wyk de Vries @ University of Minnesota
+% %Credit to Ben Popken and Andrew Wickert for portions of the toolbox.
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %Portions of this toolbox are based on a number of codes written by
+% %previous authors, including matPIV, IMGRAFT, PIVLAB, M_Map and more.
+% %Credit and thanks are due to the authors of these toolboxes, and for
+% %sharing their codes online. See the user manual for a full list of third 
+% %party codes used here. Accordingly, you are free to share, edit and
+% %add to this GIV code. Please give us credit if you do, and share your code 
+% %with the same conditions as this.
+% 
+% % Read the associated paper here: 
+% % doi.org/10.5194/tc-15-2115-2021
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                         %Version 1.0, Spring-Summer 2021%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                   %Feel free to contact me at vanwy048@umn.edu%
 
 %% calculate velocity statistics
 
@@ -295,7 +294,7 @@ max_vel=reshape(max_vel,inputs.sizevel);
 max_fd=reshape(max_fd,inputs.sizevel);
 
 %std
-std_vel = max_vel-min_vel;
+std_vel = abs(max_vel-min_vel);
 fdtemp(:,:,1) = max_fd-min_fd; fdtemp(:,:,2) = min_fd-max_fd; fdtemp(:,:,3) = max_fd+360-min_fd; fdtemp(:,:,4) = min_fd+360-max_fd;
 std_fd = min(fdtemp,[],3); %Smallest angle
 std_vel=reshape(std_vel,inputs.sizevel);
