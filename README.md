@@ -1,5 +1,7 @@
 # glacier-image-velocimetry
-GUI based toolbox for calculating glacier surface velocities from satellite imagery.
+GUI based toolbox for calculating glacier surface velocities from satellite imagery. This is Version 1.0 (May 2021).
+
+Please cite our TC paper if you use this code or toolbox: doi.org/10.5194/tc-15-2115-2021 .
 
 Easy to use, rapid and robust glacier velocity calculation toolbox.
 
