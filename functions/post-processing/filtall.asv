@@ -156,7 +156,7 @@ if size(full_u,1) == 1
 else % More than one image pair, do averaging
     
     
-    num_stand_dev = 2; %Number of standard deviations to consider outliers. Set to 2 by default
+    num_stand_dev = 10; %Number of standard deviations to consider outliers. Set to 2 by default
     
     
     %%%%%%%%%%%%%%%% First, x and y components
@@ -222,8 +222,31 @@ else % More than one image pair, do averaging
     %Calculate mean and standard deviation using circular statistics
     [mean_fd,std_fd] = GIV_circstats(full_fd);
     
-    %Call seperate function to filter flow directions
-    [out_limits_fd] = fd_outlier_filter(full_fd,mean_fd,std_fd,num_stand_dev);
+    % find points in the stack that are more than num_stand_dev standard deviations outside
+    % of the mean.
+    low_fd = mean_fd - num_stand_dev * std_fd;
+    templow_fd = mean_fd - num_stand_dev * std_fd;
+    high_fd = mean_fd + num_stand_dev * std_fd;
+    temphigh_fd = mean_fd + num_stand_dev * std_fd;
+    %Find if any are out of 0-360 circle
+    poslow = low_fd<0;
+    poshigh = temphigh_fd>360;
+    %flip where needed
+    high_fd(poslow)=360+templow_fd(poslow);
+    low_fd(poslow)=temphigh_fd(poslow);
+    low_fd(poshigh)=temphigh_fd(poshigh)-360;
+    high_fd(poshigh)=templow_fd(poshigh);
+    
+    %make full arrays of limits
+    full_low_fd = [];
+    full_high_fd = [];
+    for index = 1:size(full_fd,1)
+        full_low_fd(index,:) = low_fd;
+        full_high_fd(index,:) = high_fd;
+    end
+    
+    % where is it out of limit in BOTH (i.e. not caused by the boundary)
+    out_limits_fd = double((double(full_fd<full_low_fd)+double(full_fd>full_high_fd))>=1);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %Secondly, lets do this for the velocities.

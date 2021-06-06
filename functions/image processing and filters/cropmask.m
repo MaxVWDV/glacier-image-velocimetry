@@ -93,12 +93,12 @@ if min(size_matrix(:,1)) ~= max(size_matrix(:,1)) || min(size_matrix(:,2)) ~= ma
     rightsizex = min(size_matrix(:,2));
     
     if size(mask_0_1,1) ~= rightsizey || size(mask_0_1,2) ~=rightsizex
-       mask_0_1 = interp2(mask_0_1, linspace(1, size(mask_0_1,2), rightsizex).', linspace(1, size(mask_0_1,1), rightsizey));
+       mask_0_1 = interp2(double(mask_0_1), linspace(1, size(mask_0_1,2), rightsizex).', linspace(1, size(mask_0_1,1), rightsizey));
     end
 
     for i = 2:size(images,1)
         if size(images{i,3},1) ~= rightsizey || size(images{i,3},2) ~=rightsizex 
-            images{i,3} = interp2(images{i,3}, (linspace(1, size(images{i,3},2), rightsizex).'), linspace(1, size(images{i,3},1), rightsizey));
+            images{i,3} = interp2(double(images{i,3}), (linspace(1, size(images{i,3},2), rightsizex).'), linspace(1, size(images{i,3},1), rightsizey));
         end
     end
 end

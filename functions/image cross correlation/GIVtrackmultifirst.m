@@ -87,6 +87,7 @@ for jj=1:((1-overlap)*winsize):sy-winsize+1
             else
               [max_y1,max_x1]=find(R==max(max(R(0.5*winsize+2:1.5*winsize-3,0.5*M+2:1.5*M-3))));
             end
+
             
             if length(max_x1)>1
               max_x1=round(sum(max_x1.*(1:length(max_x1))')./sum(max_x1));

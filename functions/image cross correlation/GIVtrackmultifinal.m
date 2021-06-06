@@ -106,7 +106,7 @@ for jj=1:((1-overlap)*winsize):sy-winsize+1
                 % or parabolic fit
                 [x0, y0]=GIVtrackmultipeak(max_x1,max_y1,R(max_y1,max_x1),...
                     R(max_y1,max_x1-1),R(max_y1,max_x1+1),...
-                    R(max_y1-1,max_x1),R(max_y1+1,max_x1),3,[M,winsize]);
+                    R(max_y1-1,max_x1),R(max_y1+1,max_x1),2,[M,winsize]);
 
                 
                 % Find the signal to Noise ratio

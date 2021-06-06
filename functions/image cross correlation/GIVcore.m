@@ -95,6 +95,11 @@ mean_resolution = 0.5*(stepx+stepy);
 inputs.realresolution = ceil(inputs.idealresolution/mean_resolution)*8;
 %
 
+%Check if cell size is at least 32 (needs to be at least 8*4)
+if inputs.realresolution < 32
+    inputs.realresolution = 32;
+end
+
 %Initialize some parameters
 newcol1 = {}; %import to external (new) array in order to be parralelized
 newcol2 = {};
